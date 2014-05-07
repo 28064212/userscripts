@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
-// @version 1.6.4
+// @version 1.6.5
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
 // @include http://www.boards.ie/*
 // @include https://www.boards.ie/*
@@ -22,6 +22,7 @@
 //v1.6.2 - Show tooltips
 //v1.6.3 - fix for tooltips newlines
 //v1.6.4 - fix for l/r/etc in text boxes or with ctrl
+//1.6.5 test updates
 
 GM_addStyle("\
 	.highlight436255 {\n\
