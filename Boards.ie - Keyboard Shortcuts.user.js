@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
-// @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
-// @version 1.6.5
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @version 1.6.6
+// @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
+// @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include http://www.boards.ie/*
 // @include https://www.boards.ie/*
 // @grant GM_addStyle
@@ -23,6 +24,10 @@
 //v1.6.3 - fix for tooltips newlines
 //v1.6.4 - fix for l/r/etc in text boxes or with ctrl
 //v1.6.5 - move to github, test updates
+//v1.6.6 - @downloadURL, return if not top window
+
+if(window.top !== window.self)
+	return;
 
 GM_addStyle("\
 	.highlight436255 {\n\
@@ -45,8 +50,7 @@ GM_addStyle("\
 		width: 60%;\n\
 	}");
 
-if(window.top == window.self)
-	window.addEventListener('keydown', keyShortcuts, true);
+window.addEventListener('keydown', keyShortcuts, true);
 
 var loc = document.location.href;
 var ttforum = (loc.indexOf("/ttforum/") != -1);
