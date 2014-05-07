@@ -22,7 +22,7 @@
 //v1.6.2 - Show tooltips
 //v1.6.3 - fix for tooltips newlines
 //v1.6.4 - fix for l/r/etc in text boxes or with ctrl
-//1.6.5 test updates
+//v1.6.5 - move to github, test updates
 
 GM_addStyle("\
 	.highlight436255 {\n\
