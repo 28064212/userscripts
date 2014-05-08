@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.6.6
+// @version 1.6.7
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include http://www.boards.ie/*
@@ -25,53 +25,53 @@
 //v1.6.4 - fix for l/r/etc in text boxes or with ctrl
 //v1.6.5 - move to github, test updates
 //v1.6.6 - @downloadURL, return if not top window
+//v1.6.7 - fix for index in open threads in usercp, return is deprecated as script ending
 
-if(window.top !== window.self)
-	return;
-
-GM_addStyle("\
-	.highlight436255 {\n\
-		border:red solid 1px !important;\n\
-	}\n\
-	#tooltip436255 {\n\
-		display:none;\n\
-		position:relative;\n\
-	}\n\
-	#tooltip436255 div {\n\
-		background: #333;\n\
-    	background: rgba(0,0,0,.8);\n\
-    	border-radius: 5px;\n\
-    	color: #fff;\n\
-    	padding: 5px 15px;\n\
-    	position: absolute;\n\
-		left:40%;\n\
-		top:-20px;\n\
-    	z-index: 198;\n\
-		width: 60%;\n\
-	}");
-
-window.addEventListener('keydown', keyShortcuts, true);
-
-var loc = document.location.href;
-var ttforum = (loc.indexOf("/ttforum/") != -1);
-var ttfthread = (loc.indexOf("/ttfthread/") != -1);
-var forum = (loc.indexOf("forumdisplay.php") != -1);
-var thread = (loc.indexOf("showthread.php") != -1);
-var usercp = loc.indexOf("usercp.php") != -1;
-var homepage = (loc == "http://boards.ie/" || loc == "https://boards.ie/" || loc == "http://www.boards.ie/" || loc == "https://www.boards.ie/");
-var index = -1;
-var tdindex = 1;
-if(forum)
+if(window.top == window.self)
 {
-	if(document.getElementById('threadslist').getElementsByTagName("tr")[1].getElementsByTagName("td").length == 6)
-		tdindex = 2;
-}
-var tooltip = document.createElement('div');
-tooltip.id = 'tooltip436255';
-var tooltipinner = document.createElement('div');
-tooltip.appendChild(tooltipinner);
-var showtooltips = false;
+	GM_addStyle("\
+		.highlight436255 {\n\
+			border:red solid 1px !important;\n\
+		}\n\
+		#tooltip436255 {\n\
+			display:none;\n\
+			position:relative;\n\
+		}\n\
+		#tooltip436255 div {\n\
+			background: #333;\n\
+			background: rgba(0,0,0,.8);\n\
+			border-radius: 5px;\n\
+			color: #fff;\n\
+			padding: 5px 15px;\n\
+			position: absolute;\n\
+			left:40%;\n\
+			top:-20px;\n\
+			z-index: 198;\n\
+			width: 60%;\n\
+		}");
 
+	window.addEventListener('keydown', keyShortcuts, true);
+
+	var loc = document.location.href;
+	var ttforum = (loc.indexOf("/ttforum/") != -1);
+	var ttfthread = (loc.indexOf("/ttfthread/") != -1);
+	var forum = (loc.indexOf("forumdisplay.php") != -1);
+	var thread = (loc.indexOf("showthread.php") != -1);
+	var usercp = loc.indexOf("usercp.php") != -1;
+	var homepage = (loc == "http://boards.ie/" || loc == "https://boards.ie/" || loc == "http://www.boards.ie/" || loc == "https://www.boards.ie/");
+	var index = -1;
+	var tdindex = 1;
+	if(forum)
+	{
+		if(document.getElementById('threadslist').getElementsByTagName("tr")[1].getElementsByTagName("td").length == 6)
+			tdindex = 2;
+	}
+	var tooltip = document.createElement('div');
+	tooltip.id = 'tooltip436255';
+	var tooltipinner = document.createElement('div');
+	tooltip.appendChild(tooltipinner);
+	var showtooltips = false;
+}
 /*
 => - 39
 <= - 37
@@ -339,10 +339,13 @@ function keyShortcuts(key)
 		var linksj = document.getElementById('collapseobj_usercp_subthreads').getElementsByTagName('tr');
 		for(var j = 1; j < linksj.length - 1; j++)
 		{
-			if(linksj[j].getElementsByTagName('td')[2].getElementsByTagName('a')[0].id.lastIndexOf('thread_gotonew', 0) === 0)
-				window.open(linksj[j].getElementsByTagName('td')[2].getElementsByTagName('a')[0]);
-			else if(linksj[j].getElementsByTagName('td')[2].getElementsByTagName('a')[1].id.lastIndexOf('thread_gotonew', 0) === 0)
-				window.open(linksj[j].getElementsByTagName('td')[2].getElementsByTagName('a')[1]);
+			var x = 1;
+			if(linksj[j].getElementsByTagName("td").length == 6)
+				x = 2;
+			if(linksj[j].getElementsByTagName('td')[x].getElementsByTagName('a')[0].id.lastIndexOf('thread_gotonew', 0) === 0)
+				window.open(linksj[j].getElementsByTagName('td')[x].getElementsByTagName('a')[0]);
+			else if(linksj[j].getElementsByTagName('td')[x].getElementsByTagName('a')[1].id.lastIndexOf('thread_gotonew', 0) === 0)
+				window.open(linksj[j].getElementsByTagName('td')[x].getElementsByTagName('a')[1]);
 		}
 	}
 	else if(!intext && !ctrl && code == 81 && hl != null)
