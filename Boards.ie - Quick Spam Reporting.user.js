@@ -2,7 +2,7 @@
 // @name Boards.ie - Quick Spam Reporting
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Easily post to spammer notification thread in Feedback
-// @version 1.3
+// @version 1.3.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Quick%20Spam%20Reporting.user.js
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
 // @include http://www.boards.ie/vbulletin/showthread.php*
@@ -17,6 +17,7 @@
 // v1.2 - add username to reply box
 // v1.2.1 - new spammer thread in feedback
 // v1.3 - updated to work with Talk to Forums
+// v1.3.1 - add class identifier
 
 var NOFOLLOW = "9999";
 var NOEMAIL = "0";
@@ -54,6 +55,7 @@ if(loc.indexOf("showthread.php") != -1)
 		var link = document.createElement("a");
 		link.href = "http://www.boards.ie/vbulletin/newreply.php?do=newreply&t=2056955066&customspamname=" + users[i].innerHTML + "&customspamlink=" + users[i].href;
 		link.innerHTML = "Spammer";
+		link.classList.add('customspamlink');
 		td.appendChild(link);
 	}
 }
@@ -67,6 +69,7 @@ else if(loc.indexOf("ttfthread") != -1)
 		var link = document.createElement("a");
 		link.href = "http://www.boards.ie/vbulletin/newreply.php?do=newreply&t=2056955066&customspamname=" + username + "&customspamlink=" + userid;
 		link.innerHTML = "Report Spammer";
+		link.classList.add('customspamlink');
 		
 		var div = document.createElement("div");
 		div.className = "userinfo-row";
