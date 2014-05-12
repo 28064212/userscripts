@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.6.7
+// @version 1.6.8
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include http://www.boards.ie/*
@@ -26,6 +26,7 @@
 //v1.6.5 - move to github, test updates
 //v1.6.6 - @downloadURL, return if not top window
 //v1.6.7 - fix for index in open threads in usercp, return is deprecated as script ending
+//v1.6.8 - report spammers with 'p' if "Quick Spam Reporting" script installed, use s/x to navigate users' profile menus
 
 if(window.top == window.self)
 {
@@ -48,6 +49,13 @@ if(window.top == window.self)
 			top:-20px;\n\
 			z-index: 198;\n\
 			width: 60%;\n\
+		}\n\
+		.usermenu436255 {\n\
+			color: #ffffff;\n\
+			background-color: #3d3d3d;\n\
+		}\n\
+		.usermenu436255 a {\n\
+			color: #ffffff !important;\n\
 		}");
 
 	window.addEventListener('keydown', keyShortcuts, true);
@@ -71,19 +79,18 @@ if(window.top == window.self)
 	var tooltipinner = document.createElement('div');
 	tooltip.appendChild(tooltipinner);
 	var showtooltips = false;
+	var usermenu = null;
+	var userindex = 1;
 }
 /*
 => - 39
 <= - 37
-^ - 38
-v - 40
-Del - 46
-` - 223
 Space - 32
-\ - 220
 m - 77
 a - 65
 z - 90
+x - 88
+s - 83
 Enter - 13
 o - 79
 q - 81
@@ -91,6 +98,13 @@ t - 84
 r - 82
 f - 70
 l - 76
+p - 80
+
+\ - 220
+^ - 38
+v - 40
+Del - 46
+` - 223
  */
 function keyShortcuts(key)
 {
@@ -257,6 +271,22 @@ function keyShortcuts(key)
 			list[index].classList.add('highlight436255');
 		else
 			list[index].getElementsByTagName("td")[tdindex].classList.add('highlight436255');
+		if(usermenu != null)
+		{
+			var evt = document.createEvent("MouseEvents");
+			if(thread)
+			{
+				evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+				hl.getElementsByClassName('bigusername')[0].parentNode.dispatchEvent(evt);
+			}
+			else if(ttfthread)
+			{
+				evt.initMouseEvent("mouseout", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+				hl.getElementsByClassName('userinfo-username')[0].dispatchEvent(evt);
+			}
+			usermenu.getElementsByClassName('usermenu436255')[0].classList.remove('usermenu436255');
+			usermenu = null;
+		}
 		hl = document.getElementsByClassName('highlight436255')[0];
 		if(!isElementInViewport(hl))
 			hl.scrollIntoView(code == 90);
@@ -302,11 +332,17 @@ function keyShortcuts(key)
 	}
 	else if(usercp && !intext && code == 13 && hl != null)
 	{
+		// Enter - open highlighted forum in usercp
 		window.open(hl.getElementsByTagName("a")[0]);
+	}
+	else if((thread || ttfthread) && !intext && code == 13 && usermenu != null)
+	{
+		// Enter - open from usermenu
+		window.open(usermenu.getElementsByClassName('usermenu436255')[0].getElementsByTagName('a')[0]);
 	}
 	else if(homepage && !intext && code == 13 && hl != null)
 	{
-		// Enter - open highlighted
+		// Enter - open highlighted thread on homepage
 		if(ctrl)
 			window.open(hl.getElementsByTagName("a")[1]);
 		else if(alt)
@@ -454,12 +490,12 @@ function keyShortcuts(key)
 			}
 		}
 	}
-	else if(!intext && !ctrl && code >= 48 && code <= 57)
+	else if(!intext && !ctrl && hl != null && code >= 48 && code <= 57)
 	{
 		// 0-9: open links
-		if(thread)
+		if(thread && hl.getElementsByClassName('postcontent')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49] != null)
 			window.open(hl.getElementsByClassName('postcontent')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49]);
-		else if(ttfthread)
+		else if(ttfthread && hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49] != null)
 			window.open(hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49]);
 	}
 	else if(!intext && !ctrl && code == 76 && hl != null)
@@ -467,6 +503,69 @@ function keyShortcuts(key)
 		// l - toggle tooltips display
 		showtooltips = !showtooltips;
 		tooltip.style.display = showtooltips ? 'block' : 'none';
+	}
+	else if(!intext && !ctrl && code == 80 && hl != null && (thread || ttfthread) && hl.getElementsByClassName('customspamlink')[0] != null)
+	{
+		// p - Report spammer (if https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Quick%20Spam%20Reporting.user.js also installed)
+		window.open(hl.getElementsByClassName('customspamlink')[0]);
+	}
+	else if(!intext && !ctrl && (code == 83 || code == 88))
+	{
+		// x/s - use to navigate a user's profile menu in thread view if highlighted
+		if(thread)
+		{
+			if(usermenu == null && hl != null)
+			{
+				usermenu = hl.parentNode.getElementsByClassName('vbmenu_popup')[0];
+				var evt = document.createEvent("MouseEvents");
+				evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+				hl.getElementsByClassName('bigusername')[0].parentNode.dispatchEvent(evt);
+				userindex = 1;
+				usermenu.getElementsByTagName('td')[userindex].classList.add('usermenu436255');
+			}
+			else
+			{
+				if(code == 83 && userindex > 1)
+				{
+					usermenu.getElementsByTagName('td')[userindex].classList.remove('usermenu436255');
+					userindex--;
+					usermenu.getElementsByTagName('td')[userindex].classList.add('usermenu436255');
+				}
+				else if(code == 88 && userindex < usermenu.getElementsByTagName('td').length - 1)
+				{
+					usermenu.getElementsByTagName('td')[userindex].classList.remove('usermenu436255');
+					userindex++;
+					usermenu.getElementsByTagName('td')[userindex].classList.add('usermenu436255');
+				}
+			}
+		}
+		else if(ttfthread)
+		{
+			if(usermenu == null && hl != null)
+			{
+				usermenu = hl.getElementsByClassName('user-tools')[0];
+				var evt = document.createEvent("MouseEvents");
+				evt.initMouseEvent("mouseover", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+				hl.getElementsByClassName('userinfo-username')[0].dispatchEvent(evt);
+				userindex = 0;
+				usermenu.getElementsByTagName('li')[userindex].classList.add('usermenu436255');
+			}
+			else
+			{
+				if(code == 83 && userindex > 0)
+				{
+					usermenu.getElementsByTagName('li')[userindex].classList.remove('usermenu436255');
+					userindex--;
+					usermenu.getElementsByTagName('li')[userindex].classList.add('usermenu436255');
+				}
+				else if(code == 88 && userindex < usermenu.getElementsByTagName('li').length - 1)
+				{
+					usermenu.getElementsByTagName('li')[userindex].classList.remove('usermenu436255');
+					userindex++;
+					usermenu.getElementsByTagName('li')[userindex].classList.add('usermenu436255');
+				}
+			}
+		}
 	}
 }
 function isElementInViewport (el) {
