@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.6.8
+// @version 1.6.9
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include http://www.boards.ie/*
@@ -27,6 +27,7 @@
 //v1.6.6 - @downloadURL, return if not top window
 //v1.6.7 - fix for index in open threads in usercp, return is deprecated as script ending
 //v1.6.8 - report spammers with 'p' if "Quick Spam Reporting" script installed, use s/x to navigate users' profile menus
+//v1.6.9 - use shortcuts on search results pages
 
 if(window.top == window.self)
 {
@@ -66,6 +67,7 @@ if(window.top == window.self)
 	var forum = (loc.indexOf("forumdisplay.php") != -1);
 	var thread = (loc.indexOf("showthread.php") != -1);
 	var usercp = loc.indexOf("usercp.php") != -1;
+	var search = loc.indexOf("/search/submit/") != -1;
 	var homepage = (loc == "http://boards.ie/" || loc == "https://boards.ie/" || loc == "http://www.boards.ie/" || loc == "https://www.boards.ie/");
 	var index = -1;
 	var tdindex = 1;
@@ -126,7 +128,7 @@ function keyShortcuts(key)
 	else if(code == 39 && !intext)
 	{
 		// => - increase page, or go to last page with ctrl
-		if(ttforum || ttfthread)
+		if(ttforum || ttfthread || search)
 		{
 			if(ctrl && document.getElementsByClassName("last")[0] != null)
 				location.href = document.getElementsByClassName("last")[0];
@@ -146,13 +148,15 @@ function keyShortcuts(key)
 	else if(code == 37 && !intext)
 	{
 		// <= - decrease page, or go to parent forum with ctrl
-		if(ttforum || ttfthread)
+		if(ttforum || ttfthread || search)
 		{
-			if(ctrl)
+			if(ctrl && !search)
 			{
 				var navbarlinks = document.getElementById("breadcrumb-inner").getElementsByTagName("a");
 				location.href = navbarlinks[navbarlinks.length - 1];
 			}
+			else if(ctrl && search)
+				location.href = document.getElementsByClassName("search_pagination")[0].getElementsByTagName('a')[0];
 			else if(document.getElementsByClassName("prev")[0] != null)
 				location.href = document.getElementsByClassName("prev")[0];
 		}
@@ -197,7 +201,7 @@ function keyShortcuts(key)
 			}
 		}
 	}
-	else if((usercp || forum || ttforum || homepage || thread || ttfthread) && !intext && (code == 65 || code == 90))
+	else if((usercp || forum || ttforum || homepage || thread || ttfthread || search) && !intext && (code == 65 || code == 90))
 	{
 		// a/z - navigate forums/threads
 		var list;
@@ -213,6 +217,8 @@ function keyShortcuts(key)
 			list = document.getElementsByClassName('postcontent');
 		else if(ttfthread)
 			list = document.getElementsByClassName('postbit-wrapper');
+		else if(search)
+			list = document.getElementsByClassName('result_wrapper');
 		if(hl != null)
 			hl.classList.remove('highlight436255');
 		if(index == -1)
@@ -220,10 +226,10 @@ function keyShortcuts(key)
 			if(code == 65)
 			{
 				if(ctrl)
-					index = (thread || ttfthread) ? 0 : 1;
+					index = (thread || ttfthread || search) ? 0 : 1;
 				else
 				{
-					for(var j = list.length - 1; j > ((thread || ttfthread) ? 0 : 1) && index == -1; j--)
+					for(var j = list.length - 1; j > ((thread || ttfthread || search) ? 0 : 1) && index == -1; j--)
 					{
 						if(isElementInViewport(list[j]))
 							index = j;
@@ -238,21 +244,21 @@ function keyShortcuts(key)
 					index = list.length - 1;
 				else
 				{
-					for(var j = ((thread || ttfthread) ? 0 : 1); j < list.length && index == -1; j++)
+					for(var j = ((thread || ttfthread || search) ? 0 : 1); j < list.length && index == -1; j++)
 					{
 						if(isElementInViewport(list[j]))
 							index = j;
 					}
 					if(index == -1)
-						index = (thread || ttfthread) ? 0 : 1;
+						index = (thread || ttfthread || search) ? 0 : 1;
 				}
 			}
 		}
-		else if(code == 65 && index > ((thread || ttfthread) ? 0 : 1))
+		else if(code == 65 && index > ((thread || ttfthread || search) ? 0 : 1))
 		{
 			if(ctrl)
 			{
-				index = ((thread || ttfthread) ? 0 : 1);
+				index = ((thread || ttfthread || search) ? 0 : 1);
 				key.preventDefault();
 			}
 			else
@@ -267,11 +273,11 @@ function keyShortcuts(key)
 		}
 		if(thread)
 			list[index].parentNode.parentNode.parentNode.parentNode.classList.add('highlight436255');
-		else if(ttfthread)
+		else if(ttfthread || search)
 			list[index].classList.add('highlight436255');
 		else
 			list[index].getElementsByTagName("td")[tdindex].classList.add('highlight436255');
-		if(usermenu != null)
+		if(usermenu != null && (thread || ttfthread))
 		{
 			var evt = document.createEvent("MouseEvents");
 			if(thread)
@@ -330,9 +336,9 @@ function keyShortcuts(key)
 		else
 			window.open(hl.getElementsByTagName("a")[0]);
 	}
-	else if(usercp && !intext && code == 13 && hl != null)
+	else if((usercp || search) && !intext && code == 13 && hl != null)
 	{
-		// Enter - open highlighted forum in usercp
+		// Enter - open highlighted forum in usercp or search results
 		window.open(hl.getElementsByTagName("a")[0]);
 	}
 	else if((thread || ttfthread) && !intext && code == 13 && usermenu != null)
