@@ -3,23 +3,28 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Display notification count in page/tab title
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Notification%20in%20Title.user.js
-// @version 1.1
+// @version 1.2
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
 // @include http://www.boards.ie/*
 // @include https://www.boards.ie/*
 // ==/UserScript==
 
 //v1.1 - don't add zero
+//v1.2 - use mutationobserver instead
 
-if(document.getElementById("badge_notices") != null)
+var target = document.getElementById("badge_notices");
+if(window.top == window.self && target != null)
 {
 	var title = document.title;
-	if(document.getElementById("badge_notices").innerHTML != "0")
-		document.title = document.getElementById("badge_notices").innerHTML + ": " + title;
-	document.getElementById("badge_notices").addEventListener("DOMSubtreeModified", function(){
-		if(document.getElementById("badge_notices").innerHTML != "0")
-			document.title = document.getElementById("badge_notices").innerHTML + ": " + title;
+	if(target.innerHTML != "0")
+		document.title = target.innerHTML + ": " + title;
+	
+	var observer = new MutationObserver(function(mutations) {
+		if(target.innerHTML != "0")
+			document.title = target.innerHTML + ": " + title;
 		else
 			document.title = title;
 	});
+	var config = { attributes: false, childList: true, characterData: false };
+	observer.observe(target, config);
 }
