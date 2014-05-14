@@ -3,12 +3,13 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Display notification count in page/tab title
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Imgur%20-%20Keyboard%20Shortcuts.user.js
-// @version 1.1
-// @include /^https?://(www\.)?imgur\.com/gallery/.*/
+// @version 1.2
+// @include /^https?://(www\.)?imgur\.com/.*/
 // ==/UserScript==
 
 //v1.0 - created
 //v1.1 - use q for album expand
+//v1.2 - use 1-9/0 to open links in comments, use z on front-page to get to first image
 
 //a - 65
 //z - 90
@@ -40,7 +41,11 @@ function keyShortcuts(key)
 	var alt = key.altKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var hl = document.getElementsByClassName('highlight436255')[0];
-	if(!intext && (code == 65 || code == 90))
+    if(!intext && document.getElementById('imagelist') != null && code == 90)
+	{
+		window.location = document.getElementById('imagelist').getElementsByClassName('posts')[0].getElementsByTagName('a')[0].href;
+	}
+	else if(!intext && (code == 65 || code == 90))
 	{
 		// a/z - navigate forums/threads
 		var comments = document.getElementsByClassName('comment');
@@ -77,13 +82,13 @@ function keyShortcuts(key)
 				}
 				else
 				{
-					for(var j = 0; j < list.length && index == -1; j++)
-					{
-						if(isElementInViewport(list[j]))
-							index = j;
-					}
-					if(index == -1)
-						index = 0;
+                    for(var j = 0; j < list.length && index == -1; j++)
+                    {
+                        if(isElementInViewport(list[j]))
+                            index = j;
+                    }
+                    if(index == -1)
+                        index = 0;
 				}
 			}
 		}
@@ -146,6 +151,11 @@ function keyShortcuts(key)
 			evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
 			document.getElementById('album-truncated').getElementsByTagName('a')[0].dispatchEvent(evt);
 		}
+    }
+	else if(!intext && !ctrl && hl != null && code >= 48 && code <= 57)
+	{
+        if(hl.getElementsByClassName('usertext')[0].getElementsByTagName('a')[code == 48 ? 10 + 2 : code - 49 + 2] != null)
+            window.open(hl.getElementsByClassName('usertext')[0].getElementsByTagName('a')[code == 48 ? 10 + 2 : code - 49 + 2]);
     }
 }
 function isElementInViewport (el) {
