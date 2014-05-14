@@ -2,11 +2,10 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.6.9
+// @version 1.6.9.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
-// @include http://www.boards.ie/*
-// @include https://www.boards.ie/*
+// @include /^https?://(www\.)?boards\.ie/.*/
 // @grant GM_addStyle
 // ==/UserScript==
 
@@ -28,6 +27,7 @@
 //v1.6.7 - fix for index in open threads in usercp, return is deprecated as script ending
 //v1.6.8 - report spammers with 'p' if "Quick Spam Reporting" script installed, use s/x to navigate users' profile menus
 //v1.6.9 - use shortcuts on search results pages
+//v1.6.9.1 - bugfixes for ctrl, include attachments to posts in 0-9, regex for include
 
 if(window.top == window.self)
 {
@@ -226,7 +226,10 @@ function keyShortcuts(key)
 			if(code == 65)
 			{
 				if(ctrl)
+				{
 					index = (thread || ttfthread || search) ? 0 : 1;
+					key.preventDefault();
+				}
 				else
 				{
 					for(var j = list.length - 1; j > ((thread || ttfthread || search) ? 0 : 1) && index == -1; j--)
@@ -241,7 +244,10 @@ function keyShortcuts(key)
 			else if(code == 90)
 			{
 				if(ctrl)
+				{
 					index = list.length - 1;
+					key.preventDefault();
+				}
 				else
 				{
 					for(var j = ((thread || ttfthread || search) ? 0 : 1); j < list.length && index == -1; j++)
@@ -267,7 +273,10 @@ function keyShortcuts(key)
 		else if(code == 90 && index < list.length - 1)
 		{
 			if(ctrl)
+			{
 				index = list.length - 1;
+				key.preventDefault();
+			}
 			else
 				index++;
 		}
@@ -499,10 +508,11 @@ function keyShortcuts(key)
 	else if(!intext && !ctrl && hl != null && code >= 48 && code <= 57)
 	{
 		// 0-9: open links
-		if(thread && hl.getElementsByClassName('postcontent')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49] != null)
-			window.open(hl.getElementsByClassName('postcontent')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49]);
-		else if(ttfthread && hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49] != null)
-			window.open(hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code == 48 ? 10 : code - 49]);
+		code = code == 48 ? 10 : code - 49;
+		if(thread && hl.getElementsByClassName('postcontent')[0].parentNode.getElementsByTagName('a')[code] != null)
+			window.open(hl.getElementsByClassName('postcontent')[0].parentNode.getElementsByTagName('a')[code]);
+		else if(ttfthread && hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code] != null)
+			window.open(hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code]);
 	}
 	else if(!intext && !ctrl && code == 76 && hl != null)
 	{
