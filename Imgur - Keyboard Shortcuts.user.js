@@ -3,16 +3,18 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Display notification count in page/tab title
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Imgur%20-%20Keyboard%20Shortcuts.user.js
-// @version 1.0
+// @version 1.1
 // @include /^https?://(www\.)?imgur\.com/gallery/.*/
 // ==/UserScript==
 
 //v1.0 - created
+//v1.1 - use q for album expand
 
 //a - 65
 //z - 90
-//x - 88
-//\ - 220
+//x - 88 - expand comment
+//\ - 220 - first image, mouseover
+//q - 81 - expand album
 
 if(window.top == window.self)
 {
@@ -136,6 +138,15 @@ function keyShortcuts(key)
 			hl.getElementsByClassName('usertext')[0].getElementsByClassName('image-link')[0].dispatchEvent(evt);
 		}
 	}
+	else if(!intext && !ctrl && code == 81)
+	{
+		if(document.getElementById('album-truncated') != null)
+		{
+			var evt = document.createEvent("MouseEvents");
+			evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+			document.getElementById('album-truncated').getElementsByTagName('a')[0].dispatchEvent(evt);
+		}
+    }
 }
 function isElementInViewport (el) {
 	var rect = el.getBoundingClientRect();
