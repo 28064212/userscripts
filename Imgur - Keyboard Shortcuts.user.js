@@ -3,14 +3,14 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Display notification count in page/tab title
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Imgur%20-%20Keyboard%20Shortcuts.user.js
-// @version 1.2
+// @version 1.3
 // @include /^https?://(www\.)?imgur\.com/.*/
 // ==/UserScript==
 
 //v1.0 - created
 //v1.1 - use q for album expand
 //v1.2 - use 1-9/0 to open links in comments, use z on front-page to get to first image
-//v1.3
+//v1.3 - new imgur version
 
 //a - 65
 //z - 90
@@ -121,6 +121,12 @@ function keyShortcuts(key)
 			evt.initMouseEvent("mouseout", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
 			hl.getElementsByClassName('usertext')[0].getElementsByClassName('image-link')[0].dispatchEvent(evt);
 		}
+		else if(hl != null && hl.getElementsByClassName('usertext')[0].getElementsByClassName('imgur-image')[0] != null)
+		{
+			var evt = document.createEvent("MouseEvents");
+			evt.initMouseEvent("mouseout", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+			hl.getElementsByClassName('usertext')[0].getElementsByClassName('imgur-image')[0].dispatchEvent(evt);
+		}
 		list[index].classList.add('highlight436255');
 		hl = document.getElementsByClassName('highlight436255')[0];
 		if(!isElementInViewport(hl))
@@ -142,6 +148,12 @@ function keyShortcuts(key)
 			var evt = document.createEvent("MouseEvents");
 			evt.initMouseEvent("mouseover", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
 			hl.getElementsByClassName('usertext')[0].getElementsByClassName('image-link')[0].dispatchEvent(evt);
+		}
+		else if(hl.getElementsByClassName('usertext')[0].getElementsByClassName('imgur-image')[0] != null)
+		{
+			var evt = document.createEvent("MouseEvents");
+			evt.initMouseEvent("mouseover", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+			hl.getElementsByClassName('usertext')[0].getElementsByClassName('imgur-image')[0].dispatchEvent(evt);
 		}
 	}
 	else if(!intext && !ctrl && code == 81)
