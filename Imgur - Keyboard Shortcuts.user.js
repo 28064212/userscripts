@@ -10,6 +10,7 @@
 //v1.0 - created
 //v1.1 - use q for album expand
 //v1.2 - use 1-9/0 to open links in comments, use z on front-page to get to first image
+//v1.3
 
 //a - 65
 //z - 90
