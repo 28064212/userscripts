@@ -3,8 +3,8 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.0.1
-// @description	a/z for up/down, o to expand, enter to view
+// @version     1.0.2
+// @description	a/z for up/down, w to expand, q to view
 // @grant		GM_addStyle
 // ==/UserScript==
 
@@ -51,7 +51,7 @@ function keyShortcuts(key)
 	var hl = document.getElementsByClassName('highlight436255')[0];
 	if(!intext && (code == 65 || code == 90))
 	{
-		// a/z - navigate forums/threads
+		// a/z - up/down
 		var list = document.getElementsByClassName('title');
 		if(hl != null)
 			hl.classList.remove('highlight436255');
@@ -86,7 +86,7 @@ function keyShortcuts(key)
 							index = j;
 					}
 					if(index == -1)
-						index = (thread || ttfthread || search) ? 0 : 1;
+						index = 0;
 				}
 			}
 		}
