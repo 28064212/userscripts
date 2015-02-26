@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.6.9.1
+// @version 1.7
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
@@ -28,6 +28,7 @@
 //v1.6.8 - report spammers with 'p' if "Quick Spam Reporting" script installed, use s/x to navigate users' profile menus
 //v1.6.9 - use shortcuts on search results pages
 //v1.6.9.1 - bugfixes for ctrl, include attachments to posts in 0-9, regex for include
+//v1.7 - bugfixes for thread opening; if currently selected not in view, a/z selects from elements currently in view
 
 if(window.top == window.self)
 {
@@ -85,8 +86,8 @@ if(window.top == window.self)
 	var userindex = 1;
 }
 /*
-=> - 39
-<= - 37
+→ - 39
+← - 37
 Space - 32
 m - 77
 a - 65
@@ -103,8 +104,8 @@ l - 76
 p - 80
 
 \ - 220
-^ - 38
-v - 40
+↑ - 38
+↓ - 40
 Del - 46
 ` - 223
  */
@@ -180,7 +181,7 @@ function keyShortcuts(key)
 	}
 	else if(code == 77 && !intext && !ctrl && (forum || ttforum))
 	{
-		// M - Mark forum read
+		// m - Mark forum read
 		if(ttforum)
 		{
 			var evt = document.createEvent("MouseEvents");
@@ -221,6 +222,8 @@ function keyShortcuts(key)
 			list = document.getElementsByClassName('result_wrapper');
 		if(hl != null)
 			hl.classList.remove('highlight436255');
+		if(hl != null && !isElementInViewport(hl))
+			index = -1;
 		if(index == -1)
 		{
 			if(code == 65)
@@ -313,41 +316,49 @@ function keyShortcuts(key)
 	}
 	else if((ttforum || forum) && !intext && code == 13 && hl != null)
 	{
+		// Enter - open highlighted thread in forum view
 		if(ctrl)
 		{
+			// last unread post
 			if(ttforum)
 			{
 				if(hl.getElementsByClassName('spritethreadbit-firstunread')[0] != null)
 					window.open(hl.getElementsByClassName('spritethreadbit-firstunread')[0].parentNode);
 				else
-					window.open(hl.parentNode.getElementsByTagName("td")[tdindex+1]
-						.getElementsByTagName("a")[hl.parentNode.getElementsByTagName("td")[tdindex+1].getElementsByTagName("a").length - 2]);
+					window.open(hl.parentNode.getElementsByTagName("td")[tdindex+1].getElementsByTagName("a")[hl.parentNode.getElementsByTagName("td")[tdindex+1].getElementsByTagName("a").length - 2]);
 			}
-			else if(hl.getElementsByTagName("a")[0].id.lastIndexOf("thread_gotonew", 0) === 0)
-				window.open(hl.getElementsByTagName("a")[0]);
-			else if(hl.getElementsByTagName("a")[1].id.lastIndexOf("thread_gotonew", 0) === 0)
-				window.open(hl.getElementsByTagName("a")[1]);
 			else
-				window.open(hl.parentNode.getElementsByTagName("td")[tdindex+1]
-					.getElementsByTagName("a")[hl.parentNode.getElementsByTagName("td")[tdindex+1].getElementsByTagName("a").length - 1]);
+			{
+				var threadlinks = hl.getElementsByTagName("a");
+				for(var j = 0; j < threadlinks.length; j++)
+				{
+					if(threadlinks[j].id.lastIndexOf("thread_gotonew_") === 0)
+						window.open(threadlinks[j]);
+				}
+			}
 		}
 		else if(alt)
 		{
+			// last page
 			if(ttforum)
-				window.open(hl.getElementsByClassName('threadbit-threadlink-pages')[0]
-					.getElementsByTagName('a')[hl.getElementsByClassName('threadbit-threadlink-pages')[0].getElementsByTagName('a').length - 1]);
+				window.open(hl.getElementsByClassName('threadbit-threadlink-pages')[0].getElementsByTagName('a')[hl.getElementsByClassName('threadbit-threadlink-pages')[0].getElementsByTagName('a').length - 1]);
 			else
-				window.open(hl.getElementsByTagName("div")[0].getElementsByTagName("a")[hl
-					.getElementsByTagName("div")[0].getElementsByTagName("a").length - 1]);
+				window.open(hl.getElementsByTagName("div")[0].getElementsByTagName("a")[hl.getElementsByTagName("div")[0].getElementsByTagName("a").length - 1]);
 		}
-		else if(hl.getElementsByTagName("a")[0].id.lastIndexOf("thread_gotonew", 0) === 0)
-			window.open(hl.getElementsByTagName("a")[1]);
 		else
-			window.open(hl.getElementsByTagName("a")[0]);
+		{
+			// first post
+			var threadlinks = hl.getElementsByTagName("a");
+			for(var j = 0; j < threadlinks.length; j++)
+			{
+				if(threadlinks[j].id.lastIndexOf("thread_title_") === 0)
+					window.open(threadlinks[j]);
+			}
+		}
 	}
 	else if((usercp || search) && !intext && code == 13 && hl != null)
 	{
-		// Enter - open highlighted forum in usercp or search results
+		// Enter - open highlighted forum in usercp or thread in search results
 		window.open(hl.getElementsByTagName("a")[0]);
 	}
 	else if((thread || ttfthread) && !intext && code == 13 && usermenu != null)
@@ -359,10 +370,13 @@ function keyShortcuts(key)
 	{
 		// Enter - open highlighted thread on homepage
 		if(ctrl)
+			// last unread post
 			window.open(hl.getElementsByTagName("a")[1]);
 		else if(alt)
+			// last post
 			window.open(hl.parentNode.getElementsByTagName('td')[tdindex+1].getElementsByTagName("a")[0]);
 		else
+			// first post
 			window.open(hl.getElementsByTagName("a")[0]);
 	}
 	else if((forum || ttforum) && !intext && !ctrl && code == 79)
