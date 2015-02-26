@@ -2,8 +2,8 @@
 // @name        Feedly - Keyboard Shortcuts
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
-// @include     http://feedly.com/i/*
-// @version     1.0
+// @include	/^https?://(www\.)?feedly\.com/.*/
+// @version     1.0.1
 // @description	a/z for up/down, o to expand, enter to view
 // @grant		GM_addStyle
 // ==/UserScript==
