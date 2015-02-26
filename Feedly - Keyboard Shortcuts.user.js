@@ -5,7 +5,6 @@
 // @include     http://feedly.com/i/*
 // @version     1.0
 // @description	a/z for up/down, o to expand, enter to view
-// @include		/^https?://(www\.)?boards\.ie/.*/
 // @grant		GM_addStyle
 // ==/UserScript==
 
