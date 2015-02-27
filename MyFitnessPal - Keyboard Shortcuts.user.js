@@ -3,11 +3,11 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/MyFitnessPal%20-%20Keyboard%20Shortcuts.user.js
 // @include		/^https?://(www\.)?myfitnesspal\.com/food/add_to_diary\?meal=.*/
-// @version     1.0
+// @include		/^https?://(www\.)?myfitnesspal\.com/user/28064212/diary/add\?meal=.*/
+// @version     1.0.1
 // @description	a/z for up/down, q to select, w to select quantity
 // @grant		GM_addStyle
 // ==/UserScript==
-
 
 if(window.top == window.self)
 {
