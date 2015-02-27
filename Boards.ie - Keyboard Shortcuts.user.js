@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.7
+// @version 1.7.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
@@ -29,6 +29,7 @@
 //v1.6.9 - use shortcuts on search results pages
 //v1.6.9.1 - bugfixes for ctrl, include attachments to posts in 0-9, regex for include
 //v1.7 - bugfixes for thread opening; if currently selected not in view, a/z selects from elements currently in view
+//v1.7.1 - in talktoforum, focus on submit button to allow immediate use of keyboard
 
 if(window.top == window.self)
 {
@@ -84,6 +85,12 @@ if(window.top == window.self)
 	var showtooltips = false;
 	var usermenu = null;
 	var userindex = 1;
+	if(ttforum)
+	{
+		window.addEventListener('load', function() {
+			document.getElementById('submit').focus();
+		}, true);
+	}
 }
 /*
 → - 39
