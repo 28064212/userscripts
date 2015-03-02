@@ -3,8 +3,8 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Google%20-%20Keyboard%20Shortcuts.user.js
 // @include		/^https?://(www\.)?google\..*/
-// @version     1.0
-// @description	a/z for up/down, q to open
+// @version     1.0.1
+// @description	a/z for up/down, q to open, ctrl-space to focus search
 // @grant		GM_addStyle
 // ==/UserScript==
 
