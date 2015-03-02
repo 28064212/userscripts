@@ -128,6 +128,10 @@ function keyShortcuts(key)
 	{
 		window.location.href = document.getElementById('pnprev');
 	}
+	else if(!intext && ctrl && code == 32)
+	{
+		document.getElementsByName('q')[0].select();
+	}
 }
 function isElementInViewport (el) {
 	var rect = el.getBoundingClientRect();
