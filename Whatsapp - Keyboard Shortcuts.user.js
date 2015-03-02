@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include     https://web.whatsapp.com/
-// @version     1.0
+// @version     1.0.1
 // @grant		none
 // ==/UserScript==
 
@@ -40,9 +40,10 @@ function keyShortcuts(key)
 	var code = key.keyCode;
 	var ctrl = key.ctrlKey;
 	var alt = key.altKey;
+	var shift = key.shiftKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var side = document.getElementById('pane-side');
-	if(ctrl && (code == 40 || code == 38))
+	if(ctrl && !shift && (code == 40 || code == 38))
 	{
 		var target;
 		if(side.getElementsByClassName('active').length == 0)
