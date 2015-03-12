@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include     https://web.whatsapp.com/
-// @version     1.0.2
+// @version     1.0.3
 // @grant		none
 // ==/UserScript==
 
@@ -62,11 +62,11 @@ function keyShortcuts(key)
 			target.firstChild.dispatchEvent(evt);
 		}
 	}
-	else if(ctrl && !shift && code == 37)
+	else if(alt && !shift && code == 37)
 	{
 		document.getElementsByClassName('input-search')[0].focus();
 	}
-	else if(ctrl && !shift && code == 39)
+	else if(alt && !shift && code == 39)
 	{
 		document.getElementById('compose-input').focus();
 	}
