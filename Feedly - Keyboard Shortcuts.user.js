@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.0.2
+// @version     1.0.3
 // @description	a/z for up/down, w to expand, q to view
 // @grant		GM_addStyle
 // ==/UserScript==
@@ -52,7 +52,7 @@ function keyShortcuts(key)
 	if(!intext && (code == 65 || code == 90))
 	{
 		// a/z - up/down
-		var list = document.getElementsByClassName('title');
+		var list = document.getElementById('mainArea').getElementsByClassName('title');
 		if(hl != null)
 			hl.classList.remove('highlight436255');
 		if(hl == null || !isElementInViewport(hl))
