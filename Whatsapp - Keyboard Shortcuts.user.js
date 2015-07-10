@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name        Whatsapp - Keyboard Shortcuts
-// @namespace   https://github.com/28064212/greasemonkey-scripts
-// @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
-// @include     https://web.whatsapp.com/
-// @version     1.0.5
-// @grant		none
+// @name	Whatsapp - Keyboard Shortcuts
+// @namespace	https://github.com/28064212/greasemonkey-scripts
+// @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
+// @include	https://web.whatsapp.com/
+// @version	1.0.6
+// @grant	none
 // ==/UserScript==
 
 if(window.top == window.self)
@@ -46,15 +46,28 @@ function keyShortcuts(key)
 	var side = document.getElementById('pane-side');
 	if(ctrl && (code == 40 || code == 38))
 	{
-		var target;
+		var chats = document.getElementsByClassName('chat');
+		var target = null;
 		if(side.getElementsByClassName('active').length == 0)
-			target = document.getElementsByClassName('chat')[0].parentNode;
+		{
+			target = chats[0].parentNode;
+			for(var i = 1; i < chats.length; i++)
+			{
+				if(chats[i].parentNode.style.zIndex > target.style.zIndex)
+					target = chats[i].parentNode;
+			}
+		}
 		else
 		{
-			if(code == 40)
-				target = node_after(side.getElementsByClassName('active')[0].parentNode);
-			else
-				target = node_before(side.getElementsByClassName('active')[0].parentNode);
+			var currentIndex = parseInt(side.getElementsByClassName('active')[0].parentNode.style.zIndex);
+			for(var i = 0; i < chats.length; i++)
+			{
+				if((code == 40 && chats[i].parentNode.style.zIndex == currentIndex - 1) ||
+					(code == 38 && chats[i].parentNode.style.zIndex == currentIndex + 1))
+				{
+					target = chats[i].parentNode;
+				}
+			}
 		}
 		if(target != null)
 		{
