@@ -4,13 +4,14 @@
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Trakt%20-%20Remove%20watched,%20collected,%20low%20votes.user.js
 // @description Remove watched, collected, low votes
 // @include     http://trakt.tv/*
-// @version     1.1
+// @version     1.2
 // @grant	GM_addStyle
 // ==/UserScript==
 
 //v1.1 Trakt v2 - use ctrl+Z to bring up buttons
+//v1.2 Just remove on ctrl+Z, don't use buttons
 
-GM_addStyle("\
+/*GM_addStyle("\
 	.gmbutton {\
 		position: fixed !important;\
 		right: 10px;\
@@ -41,7 +42,7 @@ GM_addStyle("\
 		text-decoration:none;\
 		text-shadow:0px 1px 0px #5b8a3c;\
 	}\
-");
+");*/
 /*
 (function (old) {
 	window.history.pushState = function () {
@@ -58,25 +59,25 @@ if(window.top == window.self)
 		var alt = key.altKey;
 		if(code == 90 && ctrl)
 		{
-			var b1 = document.createElement("button");
+			/*var b1 = document.createElement("button");
 			b1.className = "gmbutton";
 			b1.style.top = "30px";
 			b1.innerHTML = "Watchlist";
-			b1.addEventListener('click', function() {
+			b1.addEventListener('click', function() {*/
 				var x = document.getElementsByClassName("list selected");
 				for(var i = 0; i < x.length; i++)
 					x[i].parentNode.parentNode.parentNode.style.display = 'none';
-			});
+			/*});
 			document.body.appendChild(b1);
 			var b2 = document.createElement("button");
 			b2.className = "gmbutton";
 			b2.style.top = "65px";
 			b2.innerHTML = "Collection";
-			b2.addEventListener('click', function() {
+			b2.addEventListener('click', function() {*/
 				var x = document.getElementsByClassName("collect selected");
 				for(var i = 0; i < x.length; i++)
 					x[i].parentNode.parentNode.parentNode.style.display = 'none';
-			});
+			/*});
 			document.body.appendChild(b2);
 			var b3 = document.createElement("button");
 			b3.className = "gmbutton";
@@ -90,7 +91,7 @@ if(window.top == window.self)
 						x[i].parentNode.parentNode.style.display = 'none';
 				}
 			});
-			document.body.appendChild(b3);
+			document.body.appendChild(b3);*/
 		}
 	}, true);
 }
