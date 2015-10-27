@@ -3,8 +3,8 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.0.3
-// @description	a/z for up/down, w to expand, q to view
+// @version     1.0.4
+// @description	a/z for up/down, w to expand, q to view, ctrl+\ to hide sidebar
 // @grant		GM_addStyle
 // ==/UserScript==
 
@@ -127,6 +127,23 @@ function keyShortcuts(key)
 		evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
 		hl.dispatchEvent(evt);
 		hl.classList.add('highlight436255');
+	}
+	else if(!intext && ctrl && !alt && code == 220)
+	{
+		if(document.getElementById('feedlyTabsHolder').style.display != 'none')
+		{
+			document.getElementById('feedlyTabsHolder').style.display = 'none';
+			document.getElementById('feedlyFrame').style.marginLeft = 'auto';
+			document.getElementById('mainBar').style.width = 'auto';
+			document.getElementById('feedlyPart0').style.paddingLeft = 'auto';
+		}
+		else
+		{
+			document.getElementById('feedlyTabsHolder').style.display = 'block';
+			document.getElementById('feedlyFrame').style.marginLeft = '268px';
+			document.getElementById('mainBar').style.width = 'auto';
+			document.getElementById('feedlyPart0').style.paddingLeft = 'auto';
+		}
 	}
 }
 function isElementInViewport (el) {
