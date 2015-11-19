@@ -3,7 +3,7 @@
 // @namespace	https://github.com/28064212/greasemonkey-scripts
 // @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include	https://web.whatsapp.com/
-// @version	1.0.7
+// @version	1.0.8
 // @grant	none
 // ==/UserScript==
 
@@ -53,7 +53,7 @@ function keyShortcuts(key)
 			target = chats[0].parentNode;
 			for(var i = 1; i < chats.length; i++)
 			{
-				if(chats[i].parentNode.style.zIndex > target.style.zIndex)
+				if(chats[i].parentNode.parentNode.style.zIndex > target.parentNode.style.zIndex)
 					target = chats[i].parentNode;
 			}
 		}
