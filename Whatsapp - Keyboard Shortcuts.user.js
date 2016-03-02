@@ -3,9 +3,11 @@
 // @namespace	https://github.com/28064212/greasemonkey-scripts
 // @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include	https://web.whatsapp.com/
-// @version	1.0.8
+// @version	1.0.9
 // @grant	none
 // ==/UserScript==
+
+//v1.0.9 - use 'mousedown' instead of 'click'
 
 if(window.top == window.self)
 {
@@ -71,9 +73,15 @@ function keyShortcuts(key)
 		}
 		if(target != null)
 		{
-			var evt = document.createEvent("MouseEvents");
-			evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-			target.firstChild.dispatchEvent(evt);
+			// var evt = document.createEvent("MouseEvents");
+			// evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+			// target.firstChild.dispatchEvent(evt);
+			var event = new MouseEvent('mousedown', {
+				'view': window,
+				'bubbles': true,
+				'cancelable': true
+			});
+			target.lastChild.dispatchEvent(event);
 		}
 	}
 	else if(ctrl && code == 220)
