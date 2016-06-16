@@ -4,6 +4,7 @@
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Trakt%20-%20Remove%20watched,%20collected,%20low%20votes.user.js
 // @description Remove watched, collected, low votes
 // @include     http://trakt.tv/*
+// @include     https://trakt.tv/*
 // @version     1.2
 // @grant	GM_addStyle
 // ==/UserScript==
