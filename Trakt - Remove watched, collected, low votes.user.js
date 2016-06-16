@@ -5,12 +5,13 @@
 // @description Remove watched, collected, low votes
 // @include     http://trakt.tv/*
 // @include     https://trakt.tv/*
-// @version     1.2
+// @version     1.3
 // @grant	GM_addStyle
 // ==/UserScript==
 
 //v1.1 Trakt v2 - use ctrl+Z to bring up buttons
 //v1.2 Just remove on ctrl+Z, don't use buttons
+//v1.3 https support
 
 /*GM_addStyle("\
 	.gmbutton {\
