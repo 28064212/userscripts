@@ -3,7 +3,7 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Navigate comments
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Imgur%20-%20Keyboard%20Shortcuts.user.js
-// @version 1.5
+// @version 1.5.1
 // @include /^https?://(www\.)?imgur\.com/.*/
 // @grant GM_addStyle
 // ==/UserScript==
@@ -14,6 +14,7 @@
 //v1.3 - new imgur version
 //v1.4 - fix for mouseover images
 //v1.5 - selector updates, description
+//v1.5.1 - fix for load-more
 
 //a - 65 - up
 //z - 90 - down
@@ -140,8 +141,11 @@ function keyShortcuts(key)
 	{
 		if(hl.getElementsByClassName('expand')[0] != null)
 		{
-			var evt = document.createEvent("MouseEvents");
-			evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+			var evt = new MouseEvent('click', {
+				'view': window,
+				'bubbles': true,
+				'cancelable': true
+			});
 			hl.getElementsByClassName('expand')[0].dispatchEvent(evt);
 		}
 	}
@@ -160,11 +164,14 @@ function keyShortcuts(key)
 	}
 	else if(!intext && !ctrl && code == 81)
 	{
-	if(document.getElementById('album-truncated') != null)
+	if(document.getElementsByClassName('load-more')[0] != null)
 	{
-		var evt = document.createEvent("MouseEvents");
-		evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-		document.getElementById('album-truncated').getElementsByTagName('a')[0].dispatchEvent(evt);
+		var evt = new MouseEvent('click', {
+			'view': window,
+			'bubbles': true,
+			'cancelable': true
+		});
+		document.getElementsByClassName('load-more')[0].dispatchEvent(evt);
 	}
 }
 else if(!intext && !ctrl && hl != null && code >= 48 && code <= 57)
