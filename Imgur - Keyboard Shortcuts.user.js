@@ -3,7 +3,7 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Navigate comments
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Imgur%20-%20Keyboard%20Shortcuts.user.js
-// @version 1.6
+// @version 1.7
 // @include /^https?://(www\.)?imgur\.com/.*/
 // @grant GM_addStyle
 // ==/UserScript==
@@ -16,6 +16,7 @@
 //v1.5 - selector updates, description
 //v1.5.1 - fix for load-more
 //v1.6 - Chrome compatibility
+//v1.7 - Fix for expand comment, load more
 
 //a - 65 - up
 //z - 90 - down
@@ -165,13 +166,13 @@ function keyShortcuts(key)
 	}
     else if(!intext && !ctrl && code == 81)
     {
-        if(document.getElementsByClassName('load-more')[0] !== null && document.getElementsByClassName('load-more')[0] !== undefined)
+        if(document.getElementsByClassName('post-loadall')[0] !== null && document.getElementsByClassName('post-loadall')[0] !== undefined)
         {
             var evt = new MouseEvent('click', {
                 'bubbles': true,
                 'cancelable': true
 			});
-            document.getElementsByClassName('load-more')[0].dispatchEvent(evt);
+            document.getElementsByClassName('post-loadall')[0].dispatchEvent(evt);
 		}
 	}
     else if(!intext && !ctrl && hl !== null && hl !== undefined && code >= 48 && code <= 57)
