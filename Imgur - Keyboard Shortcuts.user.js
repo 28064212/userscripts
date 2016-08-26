@@ -142,13 +142,13 @@ function keyShortcuts(key)
 	}
     else if(!intext && !ctrl && code == 88)
     {
-        if(hl.getElementsByClassName('expand')[0] !== null && hl.getElementsByClassName('expand')[0] !== undefined)
+        if(hl.getElementsByClassName('comment-reply-count')[0] !== null && hl.getElementsByClassName('comment-reply-count')[0] !== undefined)
         {
             var evt = new MouseEvent('click', {
                 'bubbles': true,
                 'cancelable': true
 			});
-            hl.getElementsByClassName('expand')[0].dispatchEvent(evt);
+            hl.getElementsByClassName('comment-reply-count')[0].dispatchEvent(evt);
 		}
 	}
     else if(!intext && !ctrl && code == 220)
