@@ -3,14 +3,19 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.0.4
+// @version     1.0.5
 // @description	a/z for up/down, w to expand, q to view, ctrl+\ to hide sidebar
 // @grant		GM_addStyle
 // ==/UserScript==
 
+//v1.0.5 - fix q shortcut
+
 if(window.top == window.self)
 {
 	GM_addStyle("\
+		.fx .entry.u0{\n\
+			margin-bottom:auto !important;\n\
+		}\n\
 		.highlight436255 {\n\
 			border:red solid 1px !important;\n\
 		}");
@@ -52,7 +57,7 @@ function keyShortcuts(key)
 	if(!intext && (code == 65 || code == 90))
 	{
 		// a/z - up/down
-		var list = document.getElementById('mainArea').getElementsByClassName('title');
+		var list = document.getElementById('feedlyPageFX').getElementsByClassName('entry');
 		if(hl != null)
 			hl.classList.remove('highlight436255');
 		if(hl == null || !isElementInViewport(hl))
@@ -117,7 +122,8 @@ function keyShortcuts(key)
 		//evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, true, false, false, false, 0, null);
 		//hl.parentNode.parentNode.parentNode.getElementsByClassName('condensedTools')[0].getElementsByTagName('a')[0].dispatchEvent(evt);
 		//hl.parentNode.parentNode.parentNode.parentNode.getElementsByClassName('inlineFrame')[0].getElementsByTagName('a')[0].dispatchEvent(evt);
-		window.open(hl.parentNode.parentNode.parentNode.getElementsByClassName('condensedTools')[0].getElementsByTagName('a')[0])
+		//window.open(hl.parentNode.parentNode.parentNode.getElementsByClassName('condensedTools')[0].getElementsByTagName('a')[0])
+		window.open(hl.getElementsByClassName("title")[0])
 		hl.classList.add('highlight436255');
 	}
 	else if(!intext && !ctrl && !alt && code == 87 && hl != null)
