@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.7.1
+// @version 1.8
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
@@ -30,6 +30,7 @@
 //v1.6.9.1 - bugfixes for ctrl, include attachments to posts in 0-9, regex for include
 //v1.7 - bugfixes for thread opening; if currently selected not in view, a/z selects from elements currently in view
 //v1.7.1 - in talktoforum, focus on submit button to allow immediate use of keyboard
+//v1.8 - switch to q instead of enter to open threads
 
 if(window.top == window.self)
 {
@@ -321,9 +322,9 @@ function keyShortcuts(key)
 			hl.appendChild(tooltip);
 		}
 	}
-	else if((ttforum || forum) && !intext && code == 13 && hl != null)
+	else if((ttforum || forum) && !intext && code == 81 && hl != null)
 	{
-		// Enter - open highlighted thread in forum view
+		// q - open highlighted thread in forum view
 		if(ctrl)
 		{
 			// last unread post
@@ -373,7 +374,7 @@ function keyShortcuts(key)
 		// Enter - open from usermenu
 		window.open(usermenu.getElementsByClassName('usermenu436255')[0].getElementsByTagName('a')[0]);
 	}
-	else if(homepage && !intext && code == 13 && hl != null)
+	else if(homepage && !intext && code == 81 && hl != null)
 	{
 		// Enter - open highlighted thread on homepage
 		if(ctrl)
