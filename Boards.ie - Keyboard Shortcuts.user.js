@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.8.2
+// @version 1.8.3
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
@@ -33,6 +33,7 @@
 //v1.8 - switch to q instead of enter to open threads
 //v1.8.1 - q on usercp as well, x instead of l for preview (one-handedness), change default to last unread instead of first
 //v1.8.2 - bugfix, incorrect copy
+//v1.8.3 - bugfix, x for tooltips only on homepage / forum list
 
 if(window.top == window.self)
 {
@@ -538,7 +539,7 @@ function keyShortcuts(key)
 		else if(ttfthread && hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code] != null)
 			window.open(hl.getElementsByClassName('postbit-postbody')[0].getElementsByTagName('a')[code]);
 	}
-	else if(!intext && !ctrl && code == 88 && hl != null)
+	else if(!intext && (forum || ttforum || homepage) && !ctrl && code == 88 && hl != null)
 	{
 		// x - toggle tooltips display
 		showtooltips = !showtooltips;
