@@ -3,13 +3,13 @@
 // @namespace	https://github.com/28064212/greasemonkey-scripts
 // @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include	https://web.whatsapp.com/
-// @version	1.0.9.3
+// @version	1.0.9.4
 // @grant	none
 // ==/UserScript==
 
 //v1.0.9 - use 'mousedown' instead of 'click'
 //v1.0.9.2 - fix selection of first chat
-//v1.0.9.3 - switch to alt+shift+↑/↓ to switch between chats
+//v1.0.9.4 - switch to alt+shift+↑/↓ to switch between chats
 
 if(window.top == window.self)
 {
@@ -48,7 +48,7 @@ function keyShortcuts(key)
 	var shift = key.shiftKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var side = document.getElementById('pane-side');
-	if(ctrl && (code == 40 || code == 38))
+	if(alt && shift && (code == 40 || code == 38))
 	{
 		var chats = document.getElementsByClassName('chat');
 		var target = null;
