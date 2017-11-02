@@ -4,14 +4,27 @@
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/MyFitnessPal%20-%20Keyboard%20Shortcuts.user.js
 // @include		/^https?://(www\.)?myfitnesspal\.com/food/add_to_diary\?.*/
 // @include		/^https?://(www\.)?myfitnesspal\.com/user/.*/diary/add\?.*/
-// @version     1.0.2
+// @version     1.1
 // @description	a/z for up/down, q to select, w to select quantity
-// @grant		GM_addStyle
 // ==/UserScript==
+
+//from: https://stackoverflow.com/a/46285637
+function addGlobalStyle(css) {
+    var head, style;
+    head = document.getElementsByTagName('head')[0];
+    if (!head) {
+	console.log("a"); return; }
+	console.log("b");
+    style = document.createElement('style');
+    style.type = 'text/css';
+    //style.innerHTML = css.replace(/;/g, ' !important;');
+	style.innerHTML = css
+    head.appendChild(style);
+}
 
 if(window.top == window.self)
 {
-	GM_addStyle("\
+	addGlobalStyle("\
 		.highlight436255 {\n\
 			border:red solid 2px !important;\n\
 			font-weight: bold !important;\n\
