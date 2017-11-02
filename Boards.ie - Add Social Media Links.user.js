@@ -2,7 +2,7 @@
 // @name Boards.ie - Add Social Media Links
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Adds Google+, Twitter and Facebook share buttons to Boards.ie threads, forums and posts
-// @version 2.0.2
+// @version 2.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Add%20Social%20Media%20Links.user.js
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
 // @include http://www.boards.ie/vbulletin/showthread.php*
@@ -18,8 +18,20 @@
 //  Add share icon to every post for individual post-sharing. Added reddit.
 //v2.0.1 - minor colour change
 //v2.0.2 - reversed gradient on hover
+function addGlobalStyle(css) {
+    var head, style;
+    head = document.getElementsByTagName('head')[0];
+    if (!head) {
+	console.log("a"); return; }
+	console.log("b");
+    style = document.createElement('style');
+    style.type = 'text/css';
+    //style.innerHTML = css.replace(/;/g, ' !important;');
+	style.innerHTML = css
+    head.appendChild(style);
+}
 
-GM_addStyle(".socialpost {" +
+addGlobalStyle(".socialpost {" +
 		"position:absolute;" +
 		"top:31px;" +
 		"left:-1px;" +
