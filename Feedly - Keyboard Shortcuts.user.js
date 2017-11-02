@@ -3,16 +3,30 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.0.5
+// @version     1.1
 // @description	a/z for up/down, w to expand, q to view, ctrl+\ to hide sidebar
-// @grant		GM_addStyle
 // ==/UserScript==
 
 //v1.0.5 - fix q shortcut
 
+//from: https://stackoverflow.com/a/46285637
+function addGlobalStyle(css) {
+    var head, style;
+    head = document.getElementsByTagName('head')[0];
+    if (!head) {
+	console.log("a"); return; }
+	console.log("b");
+    style = document.createElement('style');
+    style.type = 'text/css';
+    //style.innerHTML = css.replace(/;/g, ' !important;');
+	style.innerHTML = css
+    head.appendChild(style);
+}
+
 if(window.top == window.self)
 {
-	GM_addStyle("\
+	console.log("test");
+	addGlobalStyle("\
 		.fx .entry.u0{\n\
 			margin-bottom:auto !important;\n\
 		}\n\
