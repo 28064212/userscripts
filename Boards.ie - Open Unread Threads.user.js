@@ -12,8 +12,20 @@
 // ==/UserScript==
 
 // v1.1 - updated to work with Talk to Forums
+function addGlobalStyle(css) {
+    var head, style;
+    head = document.getElementsByTagName('head')[0];
+    if (!head) {
+	console.log("a"); return; }
+	console.log("b");
+    style = document.createElement('style');
+    style.type = 'text/css';
+    //style.innerHTML = css.replace(/;/g, ' !important;');
+	style.innerHTML = css
+    head.appendChild(style);
+}
 
-GM_addStyle(".openunreadbtn{" +
+addGlobalStyle(".openunreadbtn{" +
 		"width:120px;" +
 		"height:31px;" +
 		"background:#F3F3F3;" +
