@@ -3,9 +3,8 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Navigate comments
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Imgur%20-%20Keyboard%20Shortcuts.user.js
-// @version 1.7
+// @version 1.8
 // @include /^https?://(www\.)?imgur\.com/.*/
-// @grant GM_addStyle
 // ==/UserScript==
 
 //v1.0 - created
@@ -24,9 +23,23 @@
 //\ - 220 - first image, mouseover
 //q - 81 - expand album
 
+//from: https://stackoverflow.com/a/46285637
+function addGlobalStyle(css) {
+    var head, style;
+    head = document.getElementsByTagName('head')[0];
+    if (!head) {
+	console.log("a"); return; }
+	console.log("b");
+    style = document.createElement('style');
+    style.type = 'text/css';
+    //style.innerHTML = css.replace(/;/g, ' !important;');
+	style.innerHTML = css
+    head.appendChild(style);
+}
+
 if(window.top == window.self)
 {
-    GM_addStyle("\
+    addGlobalStyle("\
 	.highlight436255 {\n\
 	border:red solid 1px !important;\n\
 	}");
