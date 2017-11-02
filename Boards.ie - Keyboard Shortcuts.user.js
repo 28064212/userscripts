@@ -2,11 +2,10 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.8.3
+// @version 1.9
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
-// @grant GM_addStyle
 // ==/UserScript==
 
 //v1.1 - don't change page if left/right used in text box
@@ -35,19 +34,28 @@
 //v1.8.2 - bugfix, incorrect copy
 //v1.8.3 - bugfix, x for tooltips only on homepage / forum list
 
+//from: https://stackoverflow.com/a/46285637
+function addGlobalStyle(css) {
+    var head, style;
+    head = document.getElementsByTagName('head')[0];
+    if (!head) { return; }
+    style = document.createElement('style');
+    style.type = 'text/css';
+    //style.innerHTML = css.replace(/;/g, ' !important;');
+	style.innerHTML = css
+    head.appendChild(style);
+}
+
 if(window.top == window.self)
 {
-	GM_addStyle("\
-		.highlight436255 {\n\
-			border:red solid 1px !important;\n\
-		}\n\
+	addGlobalStyle("\.highlight436255 { border:red solid 1px !important; }\n\
 		#tooltip436255 {\n\
 			display:none;\n\
 			position:relative;\n\
 		}\n\
 		#tooltip436255 div {\n\
 			background: #333;\n\
-			background: rgba(0,0,0,.8);\n\
+			background: rgba(0,0,0,.9);\n\
 			border-radius: 5px;\n\
 			color: #fff;\n\
 			padding: 5px 15px;\n\
@@ -62,7 +70,7 @@ if(window.top == window.self)
 			background-color: #3d3d3d;\n\
 		}\n\
 		.usermenu436255 a {\n\
-			color: #ffffff !important;\n\
+			color: #ffffff;\n\
 		}");
 
 	window.addEventListener('keydown', keyShortcuts, true);
