@@ -3,7 +3,7 @@
 // @namespace	https://github.com/28064212/greasemonkey-scripts
 // @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include	https://web.whatsapp.com/
-// @version	1.0.9.4
+// @version	1.0.9.5
 // @grant	none
 // ==/UserScript==
 
@@ -58,11 +58,11 @@ function keyShortcuts(key)
 		}
 		else
 		{
-			var currentIndex = parseInt(side.getElementsByClassName('active')[0].parentNode.parentNode.style.zIndex);
+			var currentIndex = parseInt(side.getElementsByClassName('active')[0].parentNode.parentNode.parentNode.style.zIndex);
 			for(var i = 0; i < chats.length; i++)
 			{
-				if((code == 40 && chats[i].parentNode.parentNode.style.zIndex == currentIndex - 1) ||
-					(code == 38 && chats[i].parentNode.parentNode.style.zIndex == currentIndex + 1))
+				if((code == 40 && chats[i].parentNode.parentNode.parentNode.style.zIndex == currentIndex - 1) ||
+					(code == 38 && chats[i].parentNode.parentNode.parentNode.style.zIndex == currentIndex + 1))
 				{
 					target = chats[i].parentNode;
 				}
@@ -73,21 +73,22 @@ function keyShortcuts(key)
 			// var evt = document.createEvent("MouseEvents");
 			// evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
 			// target.firstChild.dispatchEvent(evt);
+			// target.getElementsByClassName("chat")[0]
 			var event = new MouseEvent('mousedown', {
 				'view': window,
 				'bubbles': true,
 				'cancelable': true
 			});
-			target.lastChild.dispatchEvent(event);
+			target.getElementsByClassName("chat")[0].dispatchEvent(event);
 		}
 	}
 	else if(ctrl && code == 220)
 	{
-		document.getElementsByClassName('input-search')[0].focus();
+		document.getElementById('input-chatlist-search').focus();
 	}
 	else if(ctrl && code == 191)
 	{
-		document.getElementById('main').getElementsByClassName('input')[0].focus();
+		document.getElementsByClassName('pluggable-input-body')[0].focus();
 	}
 }
 function isElementInViewport (el) {
