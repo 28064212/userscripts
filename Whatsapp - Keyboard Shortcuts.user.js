@@ -3,13 +3,14 @@
 // @namespace	https://github.com/28064212/greasemonkey-scripts
 // @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include	https://web.whatsapp.com/
-// @version	1.0.9.5
+// @version	1.1
 // @grant	none
 // ==/UserScript==
 
 //v1.0.9 - use 'mousedown' instead of 'click'
 //v1.0.9.2 - fix selection of first chat
 //v1.0.9.4 - switch to alt+shift+↑/↓ to switch between chats
+//v1.1 - fix for server-side changes, switch to just Alt for switching
 
 if(window.top == window.self)
 {
@@ -48,23 +49,28 @@ function keyShortcuts(key)
 	var shift = key.shiftKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var side = document.getElementById('pane-side');
-	if(alt && shift && (code == 40 || code == 38))
+	if(alt && (code == 40 || code == 38))
 	{
-		var chats = document.getElementsByClassName('chat');
-		var target = null;
-		if(side.getElementsByClassName('active').length == 0)
+		var chats = side.firstChild.firstChild.firstChild.getElementsByTagName('div');
+		var target = chats[0];
+		if(side.getElementsByClassName('_1f1zm').length == 0)
 		{
-			target = document.getElementsByClassName("chat-drag-cover")[0];
+      var highest = parseInt(chats[0].style.zIndex);
+      for(var i = 1; i < chats.length; i++)
+      {
+        if(highest < parseInt(chats[i].style.zIndex))
+          target = chats[i];
+      }
 		}
 		else
 		{
-			var currentIndex = parseInt(side.getElementsByClassName('active')[0].parentNode.parentNode.parentNode.style.zIndex);
+			var currentIndex = parseInt(side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode.style.zIndex);
 			for(var i = 0; i < chats.length; i++)
 			{
-				if((code == 40 && chats[i].parentNode.parentNode.parentNode.style.zIndex == currentIndex - 1) ||
-					(code == 38 && chats[i].parentNode.parentNode.parentNode.style.zIndex == currentIndex + 1))
+				if((code == 40 && chats[i].style.zIndex == currentIndex - 1) ||
+					(code == 38 && chats[i].style.zIndex == currentIndex + 1))
 				{
-					target = chats[i].parentNode;
+					target = chats[i];
 				}
 			}
 		}
@@ -79,7 +85,7 @@ function keyShortcuts(key)
 				'bubbles': true,
 				'cancelable': true
 			});
-			target.getElementsByClassName("chat")[0].dispatchEvent(event);
+			target.firstChild.firstChild.dispatchEvent(event);
 		}
 	}
 	else if(ctrl && code == 220)
