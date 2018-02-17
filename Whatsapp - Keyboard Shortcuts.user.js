@@ -3,7 +3,7 @@
 // @namespace	https://github.com/28064212/greasemonkey-scripts
 // @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include	https://web.whatsapp.com/
-// @version	1.1
+// @version	1.1.1
 // @grant	none
 // ==/UserScript==
 
