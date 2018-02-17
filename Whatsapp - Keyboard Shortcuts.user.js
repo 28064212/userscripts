@@ -11,36 +11,37 @@
 //v1.0.9.2 - fix selection of first chat
 //v1.0.9.4 - switch to alt+shift+↑/↓ to switch between chats
 //v1.1 - fix for server-side changes, switch to just Alt for switching
+//v1.1.1 - fix for using transforms instead of z-indexes for ordering 
 
 if(window.top == window.self)
 {
 	window.addEventListener('keydown', keyShortcuts, true);
 }
 /*
-→ - 39
-← - 37
-Space - 32
-m - 77
-a - 65
-z - 90
-x - 88
-s - 83
-Enter - 13
-o - 79
-q - 81
-t - 84
-r - 82
-f - 70
-l - 76
-p - 80
-
-\ - 220
-/ - 191
-↑ - 38
-↓ - 40
-Del - 46
-` - 223
- */
+	→ - 39
+	← - 37
+	Space - 32
+	m - 77
+	a - 65
+	z - 90
+	x - 88
+	s - 83
+	Enter - 13
+	o - 79
+	q - 81
+	t - 84
+	r - 82
+	f - 70
+	l - 76
+	p - 80
+	
+	\ - 220
+	/ - 191
+	↑ - 38
+	↓ - 40
+	Del - 46
+	` - 223
+*/
 function keyShortcuts(key)
 {
 	var code = key.keyCode;
@@ -55,21 +56,32 @@ function keyShortcuts(key)
 		var target = chats[0];
 		if(side.getElementsByClassName('_1f1zm').length == 0)
 		{
-      var highest = parseInt(chats[0].style.zIndex);
-      for(var i = 1; i < chats.length; i++)
-      {
-        if(highest < parseInt(chats[i].style.zIndex))
-          target = chats[i];
-      }
+			var transform = chats[0].style.transform;
+			var lowest = parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
+			for(var i = 1; i < chats.length; i++)
+			{
+				transform = chats[i].style.transform;
+				if(lowest > parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2)))
+				{
+					lowest = parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
+					target = chats[i];
+				}
+			}
 		}
 		else
 		{
-			var currentIndex = parseInt(side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode.style.zIndex);
+			var transform = side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode.style.transform;
+			var currentIndex = parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
+			var closest;
+			var transformi, indexi;
 			for(var i = 0; i < chats.length; i++)
 			{
-				if((code == 40 && chats[i].style.zIndex == currentIndex - 1) ||
-					(code == 38 && chats[i].style.zIndex == currentIndex + 1))
+				transformi = chats[i].style.transform;
+				indexi = parseInt(transformi.substring(transformi.indexOf('(0px, ')+6,transformi.indexOf(', 0px)')-2));
+				if((code == 40 && (indexi < closest || closest == undefined) && indexi > currentIndex) ||
+					(code == 38 && (indexi > closest || closest == undefined) && indexi < currentIndex))
 				{
+					closest = indexi;
 					target = chats[i];
 				}
 			}
@@ -100,10 +112,10 @@ function keyShortcuts(key)
 function isElementInViewport (el) {
 	var rect = el.getBoundingClientRect();
 	return (
-			rect.top >= 0 &&
-			rect.left >= 0 &&
-			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-			rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+	rect.top >= 0 &&
+	rect.left >= 0 &&
+	rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+	rect.right <= (window.innerWidth || document.documentElement.clientWidth)
 	);
 }
 function is_all_ws( nod )
