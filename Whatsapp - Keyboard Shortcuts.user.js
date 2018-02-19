@@ -3,7 +3,7 @@
 // @namespace	https://github.com/28064212/greasemonkey-scripts
 // @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include	https://web.whatsapp.com/
-// @version	1.1.1
+// @version	1.1.2
 // @grant	none
 // ==/UserScript==
 
@@ -12,6 +12,7 @@
 //v1.0.9.4 - switch to alt+shift+↑/↓ to switch between chats
 //v1.1 - fix for server-side changes, switch to just Alt for switching
 //v1.1.1 - fix for using transforms instead of z-indexes for ordering 
+//v1.1.2 - bugfix for transforms, refactoring
 
 if(window.top == window.self)
 {
@@ -56,32 +57,24 @@ function keyShortcuts(key)
 		var target = chats[0];
 		if(side.getElementsByClassName('_1f1zm').length == 0)
 		{
-			var transform = chats[0].style.transform;
-			var lowest = parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
+			var lowest = getIndex(chats[0]);
 			for(var i = 1; i < chats.length; i++)
 			{
-				transform = chats[i].style.transform;
-				if(lowest > parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2)))
-				{
-					lowest = parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
-					target = chats[i];
-				}
+			if(getIndex(chats[i]) < lowest)
+				target = chats[i];
 			}
 		}
 		else
 		{
-			var transform = side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode.style.transform;
-			var currentIndex = parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
-			var closest;
-			var transformi, indexi;
+			var currentIndex = getIndex(side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode);
+			var closest, checkIndex;
 			for(var i = 0; i < chats.length; i++)
 			{
-				transformi = chats[i].style.transform;
-				indexi = parseInt(transformi.substring(transformi.indexOf('(0px, ')+6,transformi.indexOf(', 0px)')-2));
-				if((code == 40 && (indexi < closest || closest == undefined) && indexi > currentIndex) ||
-					(code == 38 && (indexi > closest || closest == undefined) && indexi < currentIndex))
+				checkIndex = getIndex(chats[i]);
+				if((code == 40 && (checkIndex < closest || closest == undefined) && checkIndex > currentIndex) ||
+					(code == 38 && (checkIndex > closest || closest == undefined) && checkIndex < currentIndex))
 				{
-					closest = indexi;
+					closest = checkIndex;
 					target = chats[i];
 				}
 			}
@@ -141,4 +134,11 @@ function node_after( sib )
 		if (!is_ignorable(sib)) return sib;
 	}
 	return null;
+}
+function getIndex(c) {
+  var transform = c.style.transform;
+  if(transform.indexOf('translateY') !== -1)
+    return parseInt(transform.substring(transform.indexOf('Y(')+2,transform.indexOf('px)')));
+  else
+    return parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
 }
