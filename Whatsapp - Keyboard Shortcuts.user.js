@@ -3,7 +3,7 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include https://web.whatsapp.com/
-// @version 1.2
+// @version 1.2.1
 // @grant none
 // @inject-into content
 // ==/UserScript==
@@ -15,6 +15,7 @@
 //v1.1.1 - fix for using transforms instead of z-indexes for ordering 
 //v1.1.2 - bugfix for transforms, refactoring
 //v1.2 - fix for @inject-into directive
+//v1.2.1 - bugfix
 
 if (window.top == window.self) {
 	window.addEventListener('keydown', keyShortcuts, true);
@@ -77,6 +78,7 @@ function keyShortcuts(key) {
 				'bubbles': true,
 				'cancelable': true
 			});
+			target.firstChild.firstChild.dispatchEvent(event);
 		}
 	} else if (ctrl && code == 220) {
 		//search
