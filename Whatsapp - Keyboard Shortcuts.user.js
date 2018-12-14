@@ -1,10 +1,11 @@
 // ==UserScript==
-// @name	Whatsapp - Keyboard Shortcuts
-// @namespace	https://github.com/28064212/greasemonkey-scripts
-// @downloadURL	https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
-// @include	https://web.whatsapp.com/
-// @version	1.1.2
-// @grant	none
+// @name Whatsapp - Keyboard Shortcuts
+// @namespace https://github.com/28064212/greasemonkey-scripts
+// @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
+// @include https://web.whatsapp.com/
+// @version 1.2
+// @grant none
+// @inject-into content
 // ==/UserScript==
 
 //v1.0.9 - use 'mousedown' instead of 'click'
@@ -13,9 +14,9 @@
 //v1.1 - fix for server-side changes, switch to just Alt for switching
 //v1.1.1 - fix for using transforms instead of z-indexes for ordering 
 //v1.1.2 - bugfix for transforms, refactoring
+//v1.2 - fix for @inject-into directive
 
-if(window.top == window.self)
-{
+if (window.top == window.self) {
 	window.addEventListener('keydown', keyShortcuts, true);
 }
 /*
@@ -43,102 +44,87 @@ if(window.top == window.self)
 	Del - 46
 	` - 223
 */
-function keyShortcuts(key)
-{
+function keyShortcuts(key) {
 	var code = key.keyCode;
 	var ctrl = key.ctrlKey;
 	var alt = key.altKey;
 	var shift = key.shiftKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var side = document.getElementById('pane-side');
-	if(alt && (code == 40 || code == 38))
-	{
+	if (alt && (code == 40 || code == 38)) {
 		var chats = side.firstChild.firstChild.firstChild.getElementsByTagName('div');
 		var target = chats[0];
-		if(side.getElementsByClassName('_1f1zm').length == 0)
-		{
+		if (side.getElementsByClassName('_1f1zm').length == 0) {
 			var lowest = getIndex(chats[0]);
-			for(var i = 1; i < chats.length; i++)
-			{
-			if(getIndex(chats[i]) < lowest)
-				target = chats[i];
+			for (var i = 1; i < chats.length; i++) {
+				if (getIndex(chats[i]) < lowest)
+					target = chats[i];
 			}
-		}
-		else
-		{
+		} else {
 			var currentIndex = getIndex(side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode);
 			var closest, checkIndex;
-			for(var i = 0; i < chats.length; i++)
-			{
+			for (var i = 0; i < chats.length; i++) {
 				checkIndex = getIndex(chats[i]);
-				if((code == 40 && (checkIndex < closest || closest == undefined) && checkIndex > currentIndex) ||
-					(code == 38 && (checkIndex > closest || closest == undefined) && checkIndex < currentIndex))
-				{
+				if ((code == 40 && (checkIndex < closest || closest == undefined) && checkIndex > currentIndex) ||
+					(code == 38 && (checkIndex > closest || closest == undefined) && checkIndex < currentIndex)) {
 					closest = checkIndex;
 					target = chats[i];
 				}
 			}
 		}
-		if(target != null)
-		{
-			// var evt = document.createEvent("MouseEvents");
-			// evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-			// target.firstChild.dispatchEvent(evt);
-			// target.getElementsByClassName("chat")[0]
+		if (target != null) {
 			var event = new MouseEvent('mousedown', {
-				'view': window,
 				'bubbles': true,
 				'cancelable': true
 			});
-			target.firstChild.firstChild.dispatchEvent(event);
 		}
-	}
-	else if(ctrl && code == 220)
-	{
-		document.getElementById('input-chatlist-search').focus();
-	}
-	else if(ctrl && code == 191)
-	{
-		document.getElementsByClassName('pluggable-input-body')[0].focus();
+	} else if (ctrl && code == 220) {
+		//search
+		document.getElementsByClassName('jN-F5')[0].focus();
+	} else if (ctrl && code == 191) {
+		//message box
+		document.getElementsByClassName('_2S1VP')[0].focus();
 	}
 }
-function isElementInViewport (el) {
+
+function isElementInViewport(el) {
 	var rect = el.getBoundingClientRect();
 	return (
-	rect.top >= 0 &&
-	rect.left >= 0 &&
-	rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-	rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+		rect.top >= 0 &&
+		rect.left >= 0 &&
+		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
 	);
 }
-function is_all_ws( nod )
-{
+
+function is_all_ws(nod) {
 	return !(/[^\t\n\r ]/.test(nod.textContent));
 }
-function is_ignorable( nod )
-{
-	return ( nod.nodeType == 8) || // A comment node
-	( (nod.nodeType == 3) && is_all_ws(nod) ) || // a text node, all ws
-	( nod.firstChild.classList.contains('list-title') );
+
+function is_ignorable(nod) {
+	return (nod.nodeType == 8) || // A comment node
+		((nod.nodeType == 3) && is_all_ws(nod)) || // a text node, all ws
+		(nod.firstChild.classList.contains('list-title'));
 }
-function node_before( sib )
-{
+
+function node_before(sib) {
 	while ((sib = sib.previousSibling)) {
 		if (!is_ignorable(sib)) return sib;
 	}
 	return null;
 }
-function node_after( sib )
-{
+
+function node_after(sib) {
 	while ((sib = sib.nextSibling)) {
 		if (!is_ignorable(sib)) return sib;
 	}
 	return null;
 }
+
 function getIndex(c) {
-  var transform = c.style.transform;
-  if(transform.indexOf('translateY') !== -1)
-    return parseInt(transform.substring(transform.indexOf('Y(')+2,transform.indexOf('px)')));
-  else
-    return parseInt(transform.substring(transform.indexOf('(0px, ')+6,transform.indexOf(', 0px)')-2));
+	var transform = c.style.transform;
+	if (transform.indexOf('translateY') !== -1)
+		return parseInt(transform.substring(transform.indexOf('Y(') + 2, transform.indexOf('px)')));
+	else
+		return parseInt(transform.substring(transform.indexOf('(0px, ') + 6, transform.indexOf(', 0px)') - 2));
 }
