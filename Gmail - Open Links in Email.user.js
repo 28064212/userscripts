@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name Gmail - Open Links in Email
 // @namespace https://github.com/28064212/greasemonkey-scripts
-// @version 1.1.3
+// @version 1.1.4
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Gmail%20-%20Open%20Links%20in%20Email.user.js
 // @description Use the number keys (0-9) to open links in first email in conversation that has been opened. 1 opens first link, etc.
-// @match https://mail.google.com/*
+// @match *://mail.google.com/*
 // @grant none
 // ==/UserScript==
 
