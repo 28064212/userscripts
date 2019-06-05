@@ -3,7 +3,7 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include https://web.whatsapp.com/
-// @version 1.2.1
+// @version 1.2.2
 // @grant none
 // @inject-into content
 // ==/UserScript==
@@ -16,6 +16,7 @@
 //v1.1.2 - bugfix for transforms, refactoring
 //v1.2 - fix for @inject-into directive
 //v1.2.1 - bugfix
+//v1.2.2 - serverside updates
 
 if (window.top == window.self) {
 	window.addEventListener('keydown', keyShortcuts, true);
@@ -53,16 +54,16 @@ function keyShortcuts(key) {
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var side = document.getElementById('pane-side');
 	if (alt && (code == 40 || code == 38)) {
-		var chats = side.firstChild.firstChild.firstChild.getElementsByTagName('div');
+		var chats = side.getElementsByClassName('X7YrQ');
 		var target = chats[0];
-		if (side.getElementsByClassName('_1f1zm').length == 0) {
+		if (side.getElementsByClassName('_3mMX1').length == 0) {
 			var lowest = getIndex(chats[0]);
 			for (var i = 1; i < chats.length; i++) {
 				if (getIndex(chats[i]) < lowest)
 					target = chats[i];
 			}
 		} else {
-			var currentIndex = getIndex(side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode);
+			var currentIndex = getIndex(side.getElementsByClassName('_3mMX1')[0].parentNode.parentNode);
 			var closest, checkIndex;
 			for (var i = 0; i < chats.length; i++) {
 				checkIndex = getIndex(chats[i]);
@@ -82,10 +83,10 @@ function keyShortcuts(key) {
 		}
 	} else if (ctrl && code == 220) {
 		//search
-		document.getElementsByClassName('jN-F5')[0].focus();
+		document.getElementsByClassName('_2zCfw')[0].focus();
 	} else if (ctrl && code == 191) {
 		//message box
-		document.getElementsByClassName('_2S1VP')[0].focus();
+		document.getElementsByClassName('_3u328')[0].focus();
 	}
 }
 
