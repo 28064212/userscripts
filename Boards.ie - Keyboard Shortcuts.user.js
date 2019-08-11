@@ -2,38 +2,11 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
-// @version 1.9.1
+// @version 1.9.2
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
 // ==/UserScript==
-
-//v1.1 - don't change page if left/right used in text box
-//v1.2 - switch to omnibox if using new skin
-//v1.2.1 - fix for ctrl+left to parent forum
-//v1.2.2 - fix for ctrl+left to parent forum
-//v1.3 - added "Mark Forums Read" functionality
-//v1.4 - updated to work with Talk To Forums
-//v1.5 - Full reworking, allow for navigation of thread lists
-//v1.5.1/2/3 - Bugfixes, minor enhancements
-//v1.6 - Also navigate post lists, follow, reply, quote
-//v1.6.1 - 0-9: open link in posts
-//v1.6.2 - Show tooltips
-//v1.6.3 - fix for tooltips newlines
-//v1.6.4 - fix for l/r/etc in text boxes or with ctrl
-//v1.6.5 - move to github, test updates
-//v1.6.6 - @downloadURL, return if not top window
-//v1.6.7 - fix for index in open threads in usercp, return is deprecated as script ending
-//v1.6.8 - report spammers with 'p' if "Quick Spam Reporting" script installed, use s/x to navigate users' profile menus
-//v1.6.9 - use shortcuts on search results pages
-//v1.6.9.1 - bugfixes for ctrl, include attachments to posts in 0-9, regex for include
-//v1.7 - bugfixes for thread opening; if currently selected not in view, a/z selects from elements currently in view
-//v1.7.1 - in talktoforum, focus on submit button to allow immediate use of keyboard
-//v1.8 - switch to q instead of enter to open threads
-//v1.8.1 - q on usercp as well, x instead of l for preview (one-handedness), change default to last unread instead of first
-//v1.8.2 - bugfix, incorrect copy
-//v1.8.3 - bugfix, x for tooltips only on homepage / forum list
-//v1.9.1 - code formatting; for following, press f again to select the follow button on the modal dialog
 
 //from: https://stackoverflow.com/a/46285637
 function addGlobalStyle(css) {
@@ -119,6 +92,7 @@ r - 82
 f - 70
 l - 76
 p - 80
+c - 67
 
 \ - 220
 ↑ - 38
@@ -517,6 +491,10 @@ function keyShortcuts(key) {
 				}
 			}
 		}
+	}
+	else if (thread && alt && code == 67) {
+		if (document.getElementById('currentPost') != null)
+			document.getElementById('currentPost').scrollIntoView();
 	}
 }
 function isElementInViewport(el) {
