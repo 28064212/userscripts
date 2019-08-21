@@ -4,14 +4,13 @@
 // @include     https://www.mapmyrun.com/workout/edit/*
 // @match       https://www.mapmyrun.com/routes/view/*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
-// @version     1.0.0
+// @version     1.0.1
 // @grant       none
 // ==/UserScript==
 if (window.top == window.self) {
 	window.addEventListener('keydown', keyShortcuts, true);
 }
 function keyShortcuts(key) {
-	key.preventDefault();
 	var code = key.keyCode;
 	var ctrl = key.ctrlKey;
 	var alt = key.altKey;
@@ -20,15 +19,18 @@ function keyShortcuts(key) {
 		var evt = new MouseEvent("click", { bubbles: true, cancelable: true });
 		document.getElementsByClassName("inner-2cIvZ")[0].dispatchEvent(evt);
 		document.getElementsByClassName("routeSelector-25BXq")[0].getElementsByTagName("input")[0].focus();
+		key.preventDefault();
 	}
 	else if (code == 83 && ctrl) {
 		// Ctrl+S on workout edit to save
 		var evt = new MouseEvent("click", { bubbles: true, cancelable: true });
 		document.getElementsByClassName("saveButton-3fynd")[0].dispatchEvent(evt);
+		key.preventDefault();
 	}
 	else if (code == 68 && ctrl) {
 		// Ctrl+D on route view to delete
 		var evt = new MouseEvent("click", { bubbles: true, cancelable: true });
 		document.getElementsByClassName("delete_route")[0].dispatchEvent(evt);
+		key.preventDefault();
 	}
 }
