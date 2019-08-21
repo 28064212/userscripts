@@ -3,6 +3,7 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @include     https://www.mapmyrun.com/workout/edit/*
 // @match       https://www.mapmyrun.com/routes/view/*
+// @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
 // @version     1.0.0
 // @grant       none
 // ==/UserScript==
