@@ -3,28 +3,26 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.1
+// @version     1.2
 // @description	a/z for up/down, w to expand, q to view, ctrl+\ to hide sidebar
 // ==/UserScript==
 
-//v1.0.5 - fix q shortcut
-
 //from: https://stackoverflow.com/a/46285637
 function addGlobalStyle(css) {
-    var head, style;
-    head = document.getElementsByTagName('head')[0];
-    if (!head) {
-	console.log("a"); return; }
+	var head, style;
+	head = document.getElementsByTagName('head')[0];
+	if (!head) {
+		console.log("a"); return;
+	}
 	console.log("b");
-    style = document.createElement('style');
-    style.type = 'text/css';
-    //style.innerHTML = css.replace(/;/g, ' !important;');
+	style = document.createElement('style');
+	style.type = 'text/css';
+	//style.innerHTML = css.replace(/;/g, ' !important;');
 	style.innerHTML = css
-    head.appendChild(style);
+	head.appendChild(style);
 }
 
-if(window.top == window.self)
-{
+if (window.top == window.self) {
 	console.log("test");
 	addGlobalStyle("\
 		.fx .entry.u0{\n\
@@ -61,117 +59,93 @@ p - 80
 Del - 46
 ` - 223
  */
-function keyShortcuts(key)
-{
+function keyShortcuts(key) {
 	var code = key.keyCode;
 	var ctrl = key.ctrlKey;
 	var alt = key.altKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var hl = document.getElementsByClassName('highlight436255')[0];
-	if(!intext && (code == 65 || code == 90))
-	{
+	if (!intext && (code == 65 || code == 90)) {
 		// a/z - up/down
 		var list = document.getElementById('feedlyPageFX').getElementsByClassName('entry');
-		if(hl != null)
+		if (hl != null)
 			hl.classList.remove('highlight436255');
-		if(hl == null || !isElementInViewport(hl))
+		if (hl == null || !isElementInViewport(hl))
 			index = -1;
-		if(index == -1)
-		{
-			if(code == 65)
-			{
-				if(ctrl)
+		if (index == -1) {
+			if (code == 65) {
+				if (ctrl)
 					index = 0;
-				else
-				{
-					for(var j = list.length - 1; j > 0 && index == -1; j--)
-					{
-						if(isElementInViewport(list[j]))
+				else {
+					for (var j = list.length - 1; j > 0 && index == -1; j--) {
+						if (isElementInViewport(list[j]))
 							index = j;
 					}
-					if(index == -1)
+					if (index == -1)
 						index = list.length - 1;
 				}
 			}
-			else if(code == 90)
-			{
-				if(ctrl)
+			else if (code == 90) {
+				if (ctrl)
 					index = list.length - 1;
-				else
-				{
-					for(var j = 0; j < list.length && index == -1; j++)
-					{
-						if(isElementInViewport(list[j]))
+				else {
+					for (var j = 0; j < list.length && index == -1; j++) {
+						if (isElementInViewport(list[j]))
 							index = j;
 					}
-					if(index == -1)
+					if (index == -1)
 						index = 0;
 				}
 			}
 		}
-		else if(code == 65 && index > 0)
-		{
-			if(ctrl)
+		else if (code == 65 && index > 0) {
+			if (ctrl)
 				index = 0;
 			else
 				index--;
 		}
-		else if(code == 90 && index < list.length - 1)
-		{
-			if(ctrl)
+		else if (code == 90 && index < list.length - 1) {
+			if (ctrl)
 				index = list.length - 1;
 			else
 				index++;
 		}
 		list[index].classList.add('highlight436255');
 		hl = document.getElementsByClassName('highlight436255')[0];
-		if(!isElementInViewport(hl))
+		if (!isElementInViewport(hl))
 			hl.scrollIntoView(code == 90);
 		key.preventDefault();
 	}
-	else if(!intext && !ctrl && !alt && code == 81 && hl != null)
-	{
+	else if (!intext && !ctrl && !alt && code == 81 && hl != null) {
 		// q - open in new tab
-		//var evt = document.createEvent("MouseEvents");
-		//evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, true, false, false, false, 0, null);
-		//hl.parentNode.parentNode.parentNode.getElementsByClassName('condensedTools')[0].getElementsByTagName('a')[0].dispatchEvent(evt);
-		//hl.parentNode.parentNode.parentNode.parentNode.getElementsByClassName('inlineFrame')[0].getElementsByTagName('a')[0].dispatchEvent(evt);
-		//window.open(hl.parentNode.parentNode.parentNode.getElementsByClassName('condensedTools')[0].getElementsByTagName('a')[0])
 		window.open(hl.getElementsByClassName("title")[0])
 		hl.classList.add('highlight436255');
 	}
-	else if(!intext && !ctrl && !alt && code == 87 && hl != null)
-	{
+	else if (!intext && !ctrl && !alt && code == 87 && hl != null) {
 		// w - expand
-		var evt = document.createEvent("MouseEvents");
-		evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+		var evt = new MouseEvent("click", { bubbles: true, cancelable: true });
 		hl.dispatchEvent(evt);
 		hl.classList.add('highlight436255');
 	}
-	else if(!intext && ctrl && !alt && code == 220)
-	{
-		if(document.getElementById('feedlyTabsHolder').style.display != 'none')
-		{
-			document.getElementById('feedlyTabsHolder').style.display = 'none';
-			document.getElementById('feedlyFrame').style.marginLeft = 'auto';
-			document.getElementById('mainBar').style.width = 'auto';
-			document.getElementById('feedlyPart0').style.paddingLeft = 'auto';
+	else if (!intext && ctrl && !alt && code == 220) {
+		if (document.getElementById('feedlyChrome__leftnav-wrapper').style.display != 'none') {
+			document.getElementById('feedlyChrome__leftnav-wrapper').style.display = 'none';
+			document.getElementById('feedlyChrome__leftnav-pin-wrapper').style.display = 'none';
+			document.getElementById('feedlyFrame').style.marginLeft = '64px';
 		}
-		else
-		{
-			document.getElementById('feedlyTabsHolder').style.display = 'block';
-			document.getElementById('feedlyFrame').style.marginLeft = '268px';
-			document.getElementById('mainBar').style.width = 'auto';
-			document.getElementById('feedlyPart0').style.paddingLeft = 'auto';
+		else {
+			document.getElementById('feedlyChrome__leftnav-wrapper').style.display = 'block';
+			document.getElementById('feedlyChrome__leftnav-pin-wrapper').style.display = 'block';
+			document.getElementById('feedlyFrame').style.marginLeft = '384px';
 		}
 	}
 }
-function isElementInViewport (el) {
+function isElementInViewport(el) {
 	var rect = el.getBoundingClientRect();
 	return (
-			rect.top >= 0 &&
-			rect.left >= 0 &&
-			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-			rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+		rect.top >= 0 &&
+		rect.left >= 0 &&
+		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
 	);
 }
