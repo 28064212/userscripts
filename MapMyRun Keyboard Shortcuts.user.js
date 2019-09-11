@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name        MapMyRun Keyboard Shortcuts
 // @namespace   https://github.com/28064212/greasemonkey-scripts
-// @include     https://www.mapmyrun.com/workout/edit/*
 // @match       https://www.mapmyrun.com/routes/view/*
+// @include     https://www.mapmyrun.com/workout/*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
-// @version     1.0.1
+// @version     1.1
 // @grant       none
 // ==/UserScript==
 if (window.top == window.self) {
@@ -32,5 +32,11 @@ function keyShortcuts(key) {
 		var evt = new MouseEvent("click", { bubbles: true, cancelable: true });
 		document.getElementsByClassName("delete_route")[0].dispatchEvent(evt);
 		key.preventDefault();
+	}
+	else if (code == 65 && ctrl) {
+		// Ctrl+A on workout view to open route and edit workout
+		key.preventDefault();
+		window.open(document.getElementById("route_info").getElementsByTagName("a")[0].href);
+		document.location = document.getElementById("workout_details_edit").href;
 	}
 }
