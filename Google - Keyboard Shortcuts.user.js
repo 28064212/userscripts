@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Google%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?google\..*/search.*/
-// @version     1.3
+// @version     1.4
 // @description	a/z for up/down, q to open, ctrl-space to focus search
 // ==/UserScript==
 
@@ -63,7 +63,7 @@ function keyShortcuts(key) {
 	var hl = document.getElementsByClassName('highlight436255')[0];
 	if (!isch && !intext && (code == 65 || code == 90)) {
 		// a/z - up/down
-		var list = document.querySelectorAll('.bkWMgd .rc, .bkWMgd .sld.vsc, .srg .rc, ._NId .rc');
+		var list = document.querySelectorAll('.rc');
 		if (hl != null)
 			hl.classList.remove('highlight436255');
 		if (hl == null || !isElementInViewport(hl))
