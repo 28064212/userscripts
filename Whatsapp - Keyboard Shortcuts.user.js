@@ -3,21 +3,10 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include https://web.whatsapp.com/
-// @version 1.2.3
+// @version 1.2.4
 // @grant none
 // @inject-into content
 // ==/UserScript==
-
-//v1.0.9 - use 'mousedown' instead of 'click'
-//v1.0.9.2 - fix selection of first chat
-//v1.0.9.4 - switch to alt+shift+↑/↓ to switch between chats
-//v1.1 - fix for server-side changes, switch to just Alt for switching
-//v1.1.1 - fix for using transforms instead of z-indexes for ordering 
-//v1.1.2 - bugfix for transforms, refactoring
-//v1.2 - fix for @inject-into directive
-//v1.2.1 - bugfix
-//v1.2.2 - serverside updates
-//v1.2.3 - serverside updates
 
 if (window.top == window.self) {
 	window.addEventListener('keydown', keyShortcuts, true);
@@ -54,17 +43,20 @@ function keyShortcuts(key) {
 	var shift = key.shiftKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var side = document.getElementById('pane-side');
+	var chats = side.getElementsByClassName('_210SC');
+	var activechat = side.getElementsByClassName('_13opk');
+	var search = document.getElementsByClassName('cBxw-')[0];
+	var messagebox = document.getElementsByClassName('_2UL8j')[0];
 	if (alt && (code == 40 || code == 38)) {
-		var chats = side.getElementsByClassName('_2wP_Y');
 		var target = chats[0];
-		if (side.getElementsByClassName('_1f1zm').length == 0) {
+		if (activechat.length == 0) {
 			var lowest = getIndex(chats[0]);
 			for (var i = 1; i < chats.length; i++) {
 				if (getIndex(chats[i]) < lowest)
 					target = chats[i];
 			}
 		} else {
-			var currentIndex = getIndex(side.getElementsByClassName('_1f1zm')[0].parentNode.parentNode);
+			var currentIndex = getIndex(activechat[0].parentNode.parentNode);
 			var closest, checkIndex;
 			for (var i = 0; i < chats.length; i++) {
 				checkIndex = getIndex(chats[i]);
@@ -84,10 +76,10 @@ function keyShortcuts(key) {
 		}
 	} else if (ctrl && code == 220) {
 		//search
-		document.getElementsByClassName('_3xlwb')[0].focus();
+		search.focus();
 	} else if (ctrl && code == 191) {
 		//message box
-		document.getElementsByClassName('_2WovP')[0].focus();
+		messagebox.focus();
 	}
 }
 
