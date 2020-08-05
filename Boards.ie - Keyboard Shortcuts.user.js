@@ -55,7 +55,8 @@ if (window.top == window.self) {
 	var thread = (loc.indexOf("showthread.php") != -1);
 	var usercp = loc.indexOf("usercp.php") != -1;
 	var search = loc.indexOf("/search/submit/") != -1;
-	var homepage = (loc == "http://boards.ie/" || loc == "https://boards.ie/" || loc == "http://www.boards.ie/" || loc == "https://www.boards.ie/");
+	let re = /^https?:\/\/(www\.)?boards\.ie(\/(\?.*)?)?$/;
+	var homepage = (re.test(loc));
 	var index = -1;
 	var tdindex = 1;
 	if (forum) {
