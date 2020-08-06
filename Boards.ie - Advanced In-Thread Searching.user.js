@@ -2,9 +2,9 @@
 // @name Boards.ie - Advanced In-Thread Searching
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Allows you to use advanced search on a single thread, including search by username
-// @version 1.2
+// @version 1.2.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Advanced%20In-Thread%20Searching.user.js
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @include http://www.boards.ie/search/advanced.php*
 // @include https://www.boards.ie/search/advanced.php*
 // @include http://www.boards.ie/vbulletin/showthread.php*

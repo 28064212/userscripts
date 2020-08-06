@@ -2,9 +2,9 @@
 // @name Boards.ie - Youtube Flash to HTML5
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Use HTML5 embed code instead of Flash
-// @version 1.0
+// @version 1.0.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Youtube%20Flash%20to%20HTML5.user.js
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @include http://www.boards.ie/vbulletin/showthread.php*
 // ==/UserScript==
 

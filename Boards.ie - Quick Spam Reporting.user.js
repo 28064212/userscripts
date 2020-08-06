@@ -2,9 +2,9 @@
 // @name Boards.ie - Quick Spam Reporting
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Easily post to spammer notification thread in Feedback
-// @version 1.3.1
+// @version 1.3.2
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Quick%20Spam%20Reporting.user.js
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @include http://www.boards.ie/vbulletin/showthread.php*
 // @include https://www.boards.ie/vbulletin/showthread.php*
 // @include http://www.boards.ie/ttfthread/*

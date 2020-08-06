@@ -5,9 +5,9 @@
 // @include https://www.boards.ie/vbulletin/forumdisplay.php*
 // @include http://www.boards.ie/ttforum/*
 // @include https://www.boards.ie/ttforum/*
-// @version 1.1
+// @version 1.1.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Open%20Unread%20Threads.user.js
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @description Open all unread threads on a forum page at the last post
 // ==/UserScript==
 

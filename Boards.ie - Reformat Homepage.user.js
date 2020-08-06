@@ -2,9 +2,9 @@
 // @name Boards.ie - Reformat Homepage
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Makes logo smaller, cuts down on whitespace
-// @version 1.3
+// @version 1.3.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Reformat%20Homepage.user.js
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @include http://www.boards.ie/
 // @include http://www.boards.ie/?
 // @include https://www.boards.ie/

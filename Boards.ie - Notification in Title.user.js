@@ -3,8 +3,8 @@
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Display notification count in page/tab title
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Notification%20in%20Title.user.js
-// @version 1.2
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @version 1.2.1
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @include http://www.boards.ie/*
 // @include https://www.boards.ie/*
 // ==/UserScript==

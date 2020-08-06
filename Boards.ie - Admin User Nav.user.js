@@ -2,9 +2,9 @@
 // @name Boards.ie - Admin User Nav
 // @namespace https://github.com/28064212/greasemonkey-scripts
 // @description Navigate between users in the Admin CP
-// @version 1.0
+// @version 1.0.1
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Admin%20User%20Nav.user.js
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @include http://www.boards.ie/admin/u.php*
 // ==/UserScript==
 
