@@ -4,7 +4,7 @@
 // @description Hides ignored users' posts totally, as well as text from posts that quote them (leaves option to display those posts)
 // @version 1.3
 // @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Total%20Ignore.user.js
-// @icon http://s3.amazonaws.com/uso_ss/icon/125952/large.png
+// @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
 // @include http://www.boards.ie/vbulletin/showthread.php*
 // @include https://www.boards.ie/vbulletin/showthread.php*
 // @grant GM_xmlhttpRequest
