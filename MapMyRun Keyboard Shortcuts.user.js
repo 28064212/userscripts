@@ -6,7 +6,7 @@
 // @match       https://www.mapmyrun.com/routes/my_routes/
 // @match       https://www.mapmyrun.com/activity_feed*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
-// @version     1.4
+// @version     1.4.1
 // @grant       none
 // ==/UserScript==
 
@@ -25,9 +25,8 @@ function keyShortcuts(key) {
 	}
 	else if (code == 65 && ctrl) {
 		// Ctrl+A to focus on Notes
-		document.getElementsByClassName('additionalStats-3QChq')[0].click();
 		document.getElementsByClassName('input-2iIsn')[0].focus();
-		window.setTimeout(function(){window.scrollTo(0,document.body.scrollHeight);},500)
+    document.getElementsByClassName('input-2iIsn')[0].scrollIntoView();
 		key.preventDefault();
 	}
 	else if (code == 83 && ctrl) {
