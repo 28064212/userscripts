@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name Boards.ie - Keyboard Shortcuts
-// @namespace https://github.com/28064212/greasemonkey-scripts
+// @namespace https://github.com/28064212/userscripts
 // @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
-// @version 1.9.5
-// @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
+// @version 1.9.6
+// @downloadURL https://github.com/28064212/userscripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
 // ==/UserScript==
@@ -124,6 +124,11 @@ function keyShortcuts(key) {
 			else if (document.getElementsByClassName("next")[0] != null)
 				location.href = document.getElementsByClassName("next")[0];
 		}
+		else if (homepage) {
+			let next = document.querySelector(".arrow-next:not(.arrow-disable)");
+			if (next != null)
+				next.click();
+		}
 		else {
 			var navlinks = document.getElementsByClassName("pagenav")[0].getElementsByTagName("a");
 			for (var i = 0; i < navlinks.length; i++) {
@@ -143,6 +148,11 @@ function keyShortcuts(key) {
 				location.href = document.getElementsByClassName("search_pagination")[0].getElementsByTagName('a')[0];
 			else if (document.getElementsByClassName("prev")[0] != null)
 				location.href = document.getElementsByClassName("prev")[0];
+		}
+		else if (homepage) {
+			let prev = document.querySelector(".arrow-prev:not(.arrow-disable)");
+			if (prev != null)
+				prev.click();
 		}
 		else {
 			if (ctrl) {
