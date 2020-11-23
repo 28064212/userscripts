@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name Whatsapp - Keyboard Shortcuts
-// @namespace https://github.com/28064212/greasemonkey-scripts
-// @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
+// @namespace https://github.com/28064212/userscripts
+// @downloadURL https://github.com/28064212/userscripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include https://web.whatsapp.com/
-// @version 1.2.4
+// @version 1.2.5
 // @grant none
 // @inject-into content
 // ==/UserScript==
@@ -43,10 +43,10 @@ function keyShortcuts(key) {
 	var shift = key.shiftKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
 	var side = document.getElementById('pane-side');
-	var chats = side.getElementsByClassName('_210SC');
-	var activechat = side.getElementsByClassName('_13opk');
-	var search = document.getElementsByClassName('cBxw-')[0];
-	var messagebox = document.getElementsByClassName('_2UL8j')[0];
+	var chats = side.getElementsByClassName('_1MZWu');
+	var activechat = side.getElementsByClassName('_1GGbM');
+	var search = document.getElementsByClassName('_2Evw0')[0];
+	var messagebox = document.getElementsByClassName('_1hRBM')[0];
 	if (alt && (code == 40 || code == 38)) {
 		var target = chats[0];
 		if (activechat.length == 0) {
@@ -76,7 +76,7 @@ function keyShortcuts(key) {
 		}
 	} else if (ctrl && code == 220) {
 		//search
-		search.focus();
+		search.click();
 	} else if (ctrl && code == 191) {
 		//message box
 		messagebox.focus();
