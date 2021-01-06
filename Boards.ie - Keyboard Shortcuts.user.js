@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/userscripts
 // @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
-// @version 1.9.6
+// @version 1.9.7
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
@@ -21,29 +21,35 @@ function addGlobalStyle(css) {
 }
 
 if (window.top == window.self) {
-	addGlobalStyle("\.highlight436255 { border:red solid 1px !important; }\n\
+	addGlobalStyle("\
+		.highlight436255 {\n\
+			border:red solid 1px !important;\n\
+			position:relative !important;\n\
+		}\n\
 		#tooltip436255 {\n\
 			display:none;\n\
-			position:relative;\n\
 		}\n\
 		#tooltip436255 div {\n\
-			background: #333;\n\
-			background: rgba(0,0,0,.9);\n\
-			border-radius: 5px;\n\
-			color: #fff;\n\
-			padding: 5px 15px;\n\
-			position: absolute;\n\
+			background:#333;\n\
+			background:rgba(0,0,0,.9);\n\
+			border-radius:5px;\n\
+			color:#fff;\n\
+			padding:5px 15px;\n\
+			position:absolute;\n\
 			left:40%;\n\
-			top:-20px;\n\
-			z-index: 198;\n\
-			width: 60%;\n\
+			top:100%;\n\
+			z-index:198;\n\
+			width:60%;\n\
 		}\n\
 		.usermenu436255 {\n\
-			color: #ffffff;\n\
-			background-color: #3d3d3d;\n\
+			color:#ffffff;\n\
+			background-color:#3d3d3d;\n\
 		}\n\
 		.usermenu436255 a {\n\
-			color: #ffffff;\n\
+			color:#ffffff;\n\
+		}\n\
+		#wrapper {\n\
+			overflow:visible !important;\n\
 		}");
 
 	window.addEventListener('keydown', keyShortcuts, true);
