@@ -2,7 +2,7 @@
 // @name Boards.ie - Keyboard Shortcuts
 // @namespace https://github.com/28064212/userscripts
 // @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
-// @version 1.9.7
+// @version 1.9.8
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Boards.ie%20-%20Keyboard%20Shortcuts.user.js
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
 // @include /^https?://(www\.)?boards\.ie/.*/
@@ -25,6 +25,7 @@ if (window.top == window.self) {
 		.highlight436255 {\n\
 			border:red solid 1px !important;\n\
 			position:relative !important;\n\
+			background-clip:padding-box !important;\n\
 		}\n\
 		#tooltip436255 {\n\
 			display:none;\n\
