@@ -6,7 +6,7 @@
 // @match       https://www.mapmyrun.com/routes/my_routes/
 // @match       https://www.mapmyrun.com/activity_feed*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
-// @version     1.4.2
+// @version     1.4.3
 // @grant       none
 // ==/UserScript==
 
@@ -35,7 +35,7 @@ function keyShortcuts(key) {
 		key.preventDefault();
 	}
 	else if (code >= 49 && code <= 57) {
-		if (window.location.href.indexOf('/workout/') != -1) {
+		if (window.location.href.indexOf('/workout/') != -1 && window.location.href.indexOf('/edit/') == -1) {
 			// 1-9 to view workout
 			document.location = window.location.toString().replace("workout", "workout/edit");
 		}
