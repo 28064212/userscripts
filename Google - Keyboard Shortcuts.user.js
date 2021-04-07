@@ -1,66 +1,49 @@
 // ==UserScript==
-// @name        Google - Keyboard Shortcuts
-// @namespace   https://github.com/28064212/userscripts
+// @name Google - Keyboard Shortcuts
+// @namespace https://github.com/28064212/userscripts
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Google%20-%20Keyboard%20Shortcuts.user.js
-// @include	/^https?://(www\.)?google\..*/search.*/
-// @version     1.5
+// @include /^https?://(www\.)?google\..*/search.*/
+// @version 1.6
 // @description	a/z for up/down, q to open, ctrl-space to focus search
 // ==/UserScript==
-
-//from: https://stackoverflow.com/a/46285637
 function addGlobalStyle(css) {
+	//from: https://stackoverflow.com/a/46285637
 	var head, style;
 	head = document.getElementsByTagName('head')[0];
 	if (!head) {
-		console.log("a");
 		return;
 	}
-	console.log("b");
 	style = document.createElement('style');
-	style.type = 'text/css';
-	//style.innerHTML = css.replace(/;/g, ' !important;');
 	style.innerHTML = css
 	head.appendChild(style);
 }
+function isElementInViewport(el) {
+	var rect = el.getBoundingClientRect();
+	var styles = window.getComputedStyle(el);
+	var visibility = styles.getPropertyValue('visibility');
+	return (
+		rect.top >= 0 &&
+		rect.left >= 0 &&
+		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+		rect.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+		visibility != 'hidden'
+	);
+}
+var index = -1;
 if (window.top == window.self) {
 	addGlobalStyle("\
 		.highlight436255 {\n\
 			border:red solid 1px !important;\n\
 		}");
 	window.addEventListener('keydown', keyShortcuts, true);
-	var index = -1;
 }
-/*
-? - 39
-? - 37
-Space - 32
-m - 77
-a - 65
-z - 90
-x - 88
-s - 83
-Enter - 13
-o - 79
-q - 81
-t - 84
-r - 82
-f - 70
-l - 76
-p - 80
-
-\ - 220
-? - 38
-? - 40
-Del - 46
-` - 223
- */
 function keyShortcuts(key) {
-	var code = key.keyCode;
-	var ctrl = key.ctrlKey;
-	var alt = key.altKey;
-	var intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
-	var isch = location.toString().indexOf('tbm=isch') >= 0; // image search
-	var hl = document.getElementsByClassName('highlight436255')[0];
+	const code = key.keyCode;
+	const ctrl = key.ctrlKey;
+	const alt = key.altKey;
+	const intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT');
+	const isch = location.toString().indexOf('tbm=isch') >= 0; // image search
+	let hl = document.getElementsByClassName('highlight436255')[0];
 	if (!isch && !intext && (code == 65 || code == 90)) {
 		// a/z - up/down
 		var list = document.querySelectorAll('.g');
@@ -80,7 +63,8 @@ function keyShortcuts(key) {
 					if (index == -1)
 						index = list.length - 1;
 				}
-			} else if (code == 90) {
+			}
+			else if (code == 90) {
 				if (ctrl)
 					index = list.length - 1;
 				else {
@@ -92,12 +76,14 @@ function keyShortcuts(key) {
 						index = 0;
 				}
 			}
-		} else if (code == 65 && index > 0) {
+		}
+		else if (code == 65 && index > 0) {
 			if (ctrl)
 				index = 0;
 			else
 				index--;
-		} else if (code == 90 && index < list.length - 1) {
+		}
+		else if (code == 90 && index < list.length - 1) {
 			if (ctrl)
 				index = list.length - 1;
 			else
@@ -108,29 +94,18 @@ function keyShortcuts(key) {
 		if (!isElementInViewport(hl))
 			hl.scrollIntoView(code == 90);
 		key.preventDefault();
-	} else if (!isch && !intext && !ctrl && !alt && code == 81 && hl != null) {
+	}
+	else if (!isch && !intext && !ctrl && !alt && code == 81 && hl != null) {
 		// q - open in new tab
-		//var evt = document.createEvent("MouseEvents");
-		//evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, true, false, false, false, 0, null);
-		//hl.parentNode.parentNode.parentNode.getElementsByClassName('condensedTools')[0].getElementsByTagName('a')[0].dispatchEvent(evt);
-		//hl.parentNode.parentNode.parentNode.parentNode.getElementsByClassName('inlineFrame')[0].getElementsByTagName('a')[0].dispatchEvent(evt);
 		window.open(hl.getElementsByTagName('a')[0]);
-		//hl.classList.add('highlight436255');
-	} else if (!isch && !intext && !ctrl && !alt && code == 39) {
+	}
+	else if (!isch && !intext && !ctrl && !alt && code == 39) {
 		window.location.href = document.getElementById('pnnext');
-	} else if (!isch && !intext && !ctrl && !alt && code == 37) {
+	}
+	else if (!isch && !intext && !ctrl && !alt && code == 37) {
 		window.location.href = document.getElementById('pnprev');
-	} else if (!intext && ctrl && code == 32) {
+	}
+	else if (!intext && ctrl && code == 32) {
 		document.getElementsByName('q')[0].select();
 	}
-}
-
-function isElementInViewport(el) {
-	var rect = el.getBoundingClientRect();
-	return (
-		rect.top >= 0 &&
-		rect.left >= 0 &&
-		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-	);
 }
