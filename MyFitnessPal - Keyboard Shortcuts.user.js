@@ -5,7 +5,8 @@
 // @include /^https?://(www\.)?myfitnesspal\.com/food/add_to_diary\?.*/
 // @include /^https?://(www\.)?myfitnesspal\.com/user/.*/diary/add\?.*/
 // @match https://www.myfitnesspal.com/food/diary*
-// @version 1.2
+// @match https://www.myfitnesspal.com/food/search
+// @version 1.2.1
 // @description	a/z for up/down, q to select, w to select quantity
 // ==/UserScript==
 
