@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name MyFitnessPal - Keyboard Shortcuts
-// @namespace https://github.com/28064212/greasemonkey-scripts
-// @downloadURL https://github.com/28064212/greasemonkey-scripts/raw/master/MyFitnessPal%20-%20Keyboard%20Shortcuts.user.js
+// @namespace https://github.com/28064212/userscripts
+// @downloadURL https://github.com/28064212/userscripts/raw/master/MyFitnessPal%20-%20Keyboard%20Shortcuts.user.js
 // @include /^https?://(www\.)?myfitnesspal\.com/food/add_to_diary\?.*/
 // @include /^https?://(www\.)?myfitnesspal\.com/user/.*/diary/add\?.*/
 // @match https://www.myfitnesspal.com/food/diary*
 // @match https://www.myfitnesspal.com/food/search
-// @version 1.2.1
+// @version 1.2.2
 // @description	a/z for up/down, q to select, w to select quantity
 // ==/UserScript==
 
@@ -23,9 +23,10 @@ function addGlobalStyle(css) {
 }
 if (window.top == window.self) {
 	addGlobalStyle("\
-		.highlight436255 {\n\
-			border:red solid 2px !important;\n\
+		.highlight436255 td {\n\
 			font-weight: bold !important;\n\
+			background-color: #00548F !important;\n\
+			color: white !important;\n\
 		}");
 	window.addEventListener('keydown', keyShortcuts, true);
 	var index = -1;
