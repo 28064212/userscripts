@@ -88,7 +88,7 @@ header, .BreadcrumbsBox {
 	margin: 0 !important;
 }
 .userinfo-row span.MItem:first-of-type {
-	clear:both !important;
+	clear: both !important;
 }
 .userinfo-row span.MItem.Rank {
 	float: left !important;
@@ -164,4 +164,66 @@ header, .BreadcrumbsBox {
 }
 .Frame-content .HomepageTitle {
 	display: block !important;
+}
+
+/* javascript requirements */
+
+body {
+	counter-reset: linkcounter;
+}
+.highlight-28064212, .highlight-28064212 td:first-child, .highlight-28064212 .postbit-postbody {
+	box-shadow: inset 5px 0px 0px 0px #3b5586 !important;
+}
+.highlight-28064212 .postbit-postbody a:not(.ReactButton)::after {
+	counter-increment: linkcounter;
+	content: ' [' counter(linkcounter) ']';
+	font-weight: normal;
+	font-size: 0.75em;
+	vertical-align: top;
+}
+a {
+	transition: none !important;
+}
+#tooltip-28064212 {
+	display: none;
+}
+#tooltip-28064212 div {
+	background: #333;
+	background: rgba(0, 0, 0, .9);
+	border-radius: 5px;
+	color: #fff;
+	padding: 5px 15px;
+	position: absolute;
+	left: 40%;
+	top: 100%;
+	z-index: 198;
+	width: 60%;
+}
+.usermenu-28064212 {
+	color: #ffffff;
+	background-color: #3d3d3d;
+}
+.usermenu-28064212 a {
+	color: #ffffff;
+}
+#wrapper {
+	overflow: visible !important;
+}
+.thanks-28064212 {
+	display: flex;
+	background-color: white;
+	border-top: 1px solid #e2e2e2;
+	font-size: 0.9em;
+	font-weight: bold;
+}
+.thanks-28064212 div:first-child {
+	min-width: 246px;
+	text-align: right;
+	padding: 10px;
+	background-color: rgb(249, 249, 249)
+}
+.thanks-28064212 div:last-child {
+	text-align: left;
+	padding: 10px;
+	border-left: 1px solid #e2e2e2;
 }
