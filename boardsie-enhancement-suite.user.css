@@ -138,6 +138,9 @@ header, .BreadcrumbsBox {
 #latest+.Comment .postbit-header {
 	font-weight: bold !important;
 }
+.Signature {
+	padding: 0 !important;
+}
 
 /* forums */
 
