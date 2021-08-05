@@ -1,0 +1,167 @@
+header, .BreadcrumbsBox {
+	position: static !important
+}
+#themeHeader {
+	display: none !important;
+}
+.Frame-content, .Breadcrumbs, .Container {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+[class^="vanilla-"][class$="-container-fullGutter-container-fullGutter-container-fullGutter"], .Breadcrumbs {
+	max-width: unset !important;
+	padding-left: 15px !important;
+	padding-right: 15px !important;
+}
+.Container {
+	max-width: none !important;
+	padding-left: 15px !important;
+	padding-right: 15px !important;
+}
+.Content.MainContent {
+	width: 100% !important;
+	flex-shrink: 0 !important;
+}
+.Panel-main {
+	display: none !important;
+}
+.forum-threadlist-wrapper {
+	margin-top: 0 !important;
+}
+.PageControls {
+	float: unset !important;
+	display: unset !important;
+	margin: 0 !important;
+}
+.PageControls-filters, .PagerBefore, .NewDiscussion, .BoxNewDiscussion, .NumberedPager {
+	margin: 0 !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	padding-left: 0 !important;
+}
+.PageControls-filters {
+	width: 100% !important;
+}
+.InformMessages {
+	left: auto !important;
+	right: 0 !important;
+}
+
+/* threads */
+
+.postbit-message, .Message.userContent {
+	padding: 0px !important;
+	margin: 0px !important;
+}
+.postbit-message {
+	padding-left: 10px !important;
+	padding-right: 10px !important;
+}
+.postbit-message~br {
+	display: none !important;
+}
+.postbit-userinfo {
+	padding-top: 8px !important;
+	height: 100% !important;
+	padding-left: 10px !important;
+	padding-right: 10px !important;
+	width: 246px !important;
+}
+.postbit-userinfo br {
+	display: none !important;
+}
+.userinfo-row {
+	display: block !important;
+}
+.userinfo-row:first-child {
+	border: none !important;
+}
+.userinfo-username {
+	float: left !important;
+}
+.ProfilePhotoLarge {
+	float: right !important;
+	margin: 0 !important;
+}
+.userinfo-row span.MItem {
+	display: block !important;
+	margin: 0 !important;
+}
+.userinfo-row span.MItem:first-of-type {
+	clear:both !important;
+}
+.userinfo-row span.MItem.Rank {
+	float: left !important;
+}
+.ItemComment::after, .ItemComment::before, .MessageList::before, .MessageList::after {
+	display: none !important;
+}
+.MessageList {
+	margin-bottom: 0 !important;
+}
+.embedExternal {
+	margin: 0 !important;
+	width: 100% !important;
+	clear: none !important;
+}
+.vanilla-d7cut4-collapsableContent-heightContainer {
+	height: auto !important;
+}
+.vanilla-toe1gy-collapsableContent-gradient {
+	opacity: 0 !important;
+}
+.vanilla-1vww8zj-collapsableContent-footer {
+	display: none !important;
+}
+.Reactions {
+	padding: 0 !important;
+	margin: 0 !important;
+	margin-right: 10px !important;
+	position: unset !important;
+	float: right !important;
+}
+.postbit-postbody .clearleft {
+	clear: both !important;
+}
+.postbit-header time {
+	visibility: hidden !important;
+}
+.postbit-header time::after {
+	content: attr(title) !important;
+	visibility: visible !important;
+	position: absolute !important;
+	left: 25px !important;
+}
+.bodybox-wrap {
+	padding-left: 100px !important;
+}
+#latest+.Comment .postbit-header {
+	font-weight: bold !important;
+}
+
+/* forums */
+
+.forum-threadlist-thread-lastpost {
+	float: left !important;
+	padding: 0 !important;
+}
+.forum-threadlist-thread-lastposter {
+	float: right !important;
+	width: unset !important;
+}
+.forum-threadlist-thread .Meta {
+	float: left !important;
+	width: unset !important;
+	line-height: unset !important;
+	margin: 0 !important;
+	margin-right: 5px !important;
+}
+.forum-threadlist-thread .Meta>* {
+	margin: 0 !important;
+}
+.Category {
+	float: right !important;
+}
+.Frame-content .HomepageTitle {
+	display: block !important;
+}
