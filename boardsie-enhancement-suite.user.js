@@ -2,29 +2,33 @@
 // @name Boardsie Enhancement Suite
 // @namespace https://github.com/28064212/userscripts
 // @icon https://raw.githubusercontent.com/28064212/userscripts/master/boardsie.png
-// @version 0.1
 // @downloadURL https://github.com/28064212/userscripts/raw/master/boardsie-enhancement-suite.user.js
-// @resource https://github.com/28064212/userscripts/raw/master/boardsie-enhancement-suite.user.css
-// @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent forum, quickly switch focus to the "Find a Forum" or Search textboxes. Use z/a to navigate thread lists, and enter to open threads
+// @resource css https://github.com/28064212/userscripts/raw/master/boardsie-enhancement-suite.user.css
+// @grant GM_getResourceText
+// @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
+// @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent, . Use z/a to navigate thread lists, and enter to open threads
+// @version 1.0
 // ==/UserScript==
 
-function isElementInViewport(el) {
-	let rect = el.getBoundingClientRect();
-	return (
-		rect.top >= 0 &&
-		rect.left >= 0 &&
-		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-	);
-}
 let index = -1;
+let showpreviews = false;
 if (window.top == window.self) {
+	let css = GM_getResourceText("css");
+	GM_addStyle(css);
 	window.addEventListener('keydown', keyShortcuts, true);
+	unboldRead();
+	removeExternalLinkCheck();
+	addThanks();
+	addPreviews();
+}
+function unboldRead() {
 	for (let t of document.querySelectorAll('.forum-threadlist-thread')) {
 		if (t.querySelector('.HasNew') == null && t.querySelector('.unread') != null)
 			t.querySelector('.unread').classList.remove('unread');
 	}
+}
+function removeExternalLinkCheck() {
 	for (let a of document.querySelectorAll('a[href]')) {
 		let url = new URL(a.href);
 		if (url.pathname.indexOf("/home/leaving") == 0 && url.hostname.indexOf('boards.ie') != -1) {
@@ -32,14 +36,78 @@ if (window.top == window.self) {
 			a.href = decodeURIComponent(a.href.substring(a.href.indexOf(needle) + needle.length))
 		}
 	}
-	addThanks();
+}
+function addPreviews() {
+	let discussions = document.querySelectorAll('a.threadbit-threadlink');
+	for (let d of discussions) {
+		let loc = new URL(d.href).pathname.replace('/discussion/', '');
+		let id = loc.slice(0, loc.indexOf('/'));
+		fetch('/api/v2/discussions/' + id + '/')
+			.then(response => {
+				if (response.ok)
+					return response.json();
+				else
+					throw new Error(response.statusText);
+			})
+			.then(data => {
+				if (data.body) {
+					let div = document.createElement("div");
+					d.parentElement.appendChild(div);
+					div.classList.add("preview-28064212");
+					div.innerHTML = data.body;
+					div.style.display = "none";
+					d.addEventListener('mouseover', function (e) {
+						e.target.parentElement.querySelector(".preview-28064212").style.display = "block";
+					});
+					d.addEventListener('mouseout', function (e) {
+						e.target.parentElement.querySelector(".preview-28064212").style.display = "none";
+					});
+				}
+			})
+			.catch(error => { });
+	}
 }
 function addThanks() {
-	for (let comment of document.querySelectorAll('.ItemComment')) {
+	let starter = document.querySelector('.ItemDiscussion');
+	if (starter && starter.querySelector('.HasCount')) {
+		let loc = window.location.pathname.replace('/discussion/', '');
+		let starterid = loc.slice(0, loc.indexOf('/'));
+		fetch('/api/v2/discussions/' + starterid + '/reactions?limit=100&type=Like')
+			.then(response => {
+				if (response.ok)
+					return response.json();
+				else
+					throw new Error(response.statusText);
+			})
+			.then(data => {
+				let thankscontainer = document.createElement('div');
+				thankscontainer.classList.add('thanks-28064212')
+				let thanksdiv = document.createElement('div');
+				let thankersdiv = document.createElement('div');
+				let thankers = [];
+				for (let d of data) {
+					thankers.push(d.user.name);
+				}
+				thankersdiv.innerText = thankers.sort(function (a, b) {
+					return a.toLowerCase().localeCompare(b.toLowerCase());
+				}).join(', ');
+				thanksdiv.innerText = "Thanks (" + thankers.length + ")";
+				thankscontainer.appendChild(thanksdiv);
+				thankscontainer.appendChild(thankersdiv);
+				starter.appendChild(thankscontainer);
+			})
+			.catch(error => { });
+	}
+	for (let comment of document.querySelectorAll('.ItemComment ')) {
 		if (comment.querySelector('.HasCount')) {
 			let id = comment.id.replace('Comment_', '');
 			fetch('/api/v2/comments/' + id + '/reactions?limit=100&type=Like')
-				.then(response => response.json())
+				.then(response => {
+					if (response.ok)
+						return response.json();
+					else
+						throw new Error(response.statusText);
+				})
 				.then(data => {
 					let thankscontainer = document.createElement('div');
 					thankscontainer.classList.add('thanks-28064212')
@@ -57,34 +125,19 @@ function addThanks() {
 					thankscontainer.appendChild(thankersdiv);
 					comment.appendChild(thankscontainer);
 				})
+				.catch(error => { });
 		}
 	}
 }
-/*
-→ - 39
-← - 37
-Space - 32
-m - 77
-a - 65
-z - 90
-x - 88
-s - 83
-Enter - 13
-o - 79
-q - 81
-t - 84
-r - 82
-f - 70
-l - 76
-p - 80
-c - 67
-
-\ - 220
-↑ - 38
-↓ - 40
-Del - 46
-` - 223
- */
+function isElementInViewport(el) {
+	let rect = el.getBoundingClientRect();
+	return (
+		rect.top >= 0 &&
+		rect.left >= 0 &&
+		rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+		rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+	);
+}
 function keyShortcuts(key) {
 	let code = key.keyCode;
 	let ctrl = key.ctrlKey;
@@ -124,8 +177,11 @@ function keyShortcuts(key) {
 			// a/z - navigate forums/threads
 			let list = document.querySelectorAll('.forum-threadlist-table tbody tr, .module-wrapper tbody tr, .ItemComment, .ItemDiscussion');
 			if (list.length > 0) {
-				if (hl)
+				if (hl) {
 					hl.classList.remove('highlight-28064212');
+					if (hl.querySelector(".preview-28064212"))
+						hl.querySelector(".preview-28064212").style.display = "none";
+				}
 				if (hl && !isElementInViewport(hl))
 					index = -1;
 				if (ctrl) {
@@ -158,12 +214,10 @@ function keyShortcuts(key) {
 				}
 				hl = list[index];
 				hl.classList.add('highlight-28064212');
+				if (showpreviews && hl.querySelector(".preview-28064212"))
+					hl.querySelector(".preview-28064212").style.display = "block";
 				if (!isElementInViewport(hl))
 					hl.scrollIntoView(code == 90);
-				// if (homepage || forum || ttforum) {
-				// 	tooltipinner.innerHTML = ttforum ? hl.getElementsByTagName('a')[0].title.replace(/(\r\n|\n|\r)/gm, '<br />') : hl.title.replace(/(\r\n|\n|\r)/gm, '<br />');
-				// 	hl.appendChild(tooltip);
-				// }
 			}
 		}
 		else if (code == 81 && hl) {
@@ -238,32 +292,138 @@ function keyShortcuts(key) {
 			// p - Report spammer (if https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Quick%20Spam%20Reporting.user.js also installed)
 			window.open(hl.getElementsByClassName('customspamlink')[0]);
 		}
-		else if (!ctrl && code == 88 && hl) {
-			// x - toggle tooltips display
+		else if (!ctrl && code == 88) {
+			// x - toggle previews display
+			showpreviews = !showpreviews;
+			if (hl.querySelector(".preview-28064212"))
+				hl.querySelector(".preview-28064212").style.display = showpreviews ? "block" : "none";
 		}
-		else if (!ctrl && (code == 83 || code == 88)) {
-			// x/s - use to navigate a user's profile menu in thread view if highlighted
-			// if (ttfthread) {
-			// 	if (usermenu == null && hl != null) {
-			// 		usermenu = hl.getElementsByClassName('user-tools')[0];
-			// 		var evt = new MouseEvent("click", { bubbles: true, cancelable: true });
-			// 		hl.getElementsByClassName('userinfo-username')[0].dispatchEvent(evt);
-			// 		userindex = 0;
-			// 		usermenu.getElementsByTagName('li')[userindex].classList.add('usermenu-28064212');
-			// 	}
-			// 	else {
-			// 		if (code == 83 && userindex > 0) {
-			// 			usermenu.getElementsByTagName('li')[userindex].classList.remove('usermenu-28064212');
-			// 			userindex--;
-			// 			usermenu.getElementsByTagName('li')[userindex].classList.add('usermenu-28064212');
-			// 		}
-			// 		else if (code == 88 && userindex < usermenu.getElementsByTagName('li').length - 1) {
-			// 			usermenu.getElementsByTagName('li')[userindex].classList.remove('usermenu-28064212');
-			// 			userindex++;
-			// 			usermenu.getElementsByTagName('li')[userindex].classList.add('usermenu-28064212');
-			// 		}
-			// 	}
-			// }
+		else if (shift && code == 191) {
+			// ? - show/hide documentation
+			let d = document.querySelector('#docs-28064212');
+			if (d == null) {
+				d = document.createElement('div');
+				d.id = 'docs-28064212';
+				d.style.display = 'none';
+				document.body.appendChild(d);
+				d.innerHTML = `
+				<div id="docs-28064212">
+				<div id="docs-content-28064212">
+					<p>Boardsie Enhancement Suite</p>
+					<div class="docs-keygroup">
+						<p>General</p>
+						<table>
+							<tbody>
+								<tr>
+									<td><kbd>?</kbd></td>
+									<td>Toggle documentation</td>
+								</tr>
+								<tr>
+									<td><kbd>a / z</kbd></td>
+									<td>Highlight next/previous</td>
+								</tr>
+								<tr>
+									<td><kbd>→</kbd></td>
+									<td>Next page</td>
+								</tr>
+								<tr>
+									<td><kbd>shift</kbd><kbd>→</kbd></td>
+									<td>Last page</td>
+								</tr>
+								<tr>
+									<td><kbd>←</kbd></td>
+									<td>Previous page</td>
+								</tr>
+								<tr>
+									<td><kbd>shift</kbd><kbd>←</kbd></td>
+									<td>First page</td>
+								</tr>
+								<tr>
+									<td><kbd>ctrl</kbd><kbd>←</kbd></td>
+									<td>Go to parent</td>
+								</tr>
+								<tr>
+									<td><kbd>ctrl</kbd><kbd>space</kbd></td>
+									<td>Focus on search box</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="docs-keygroup">
+						<p>Thread Lists</p>
+						<table>
+							<tbody>
+								<tr>
+									<td><kbd>q</kbd></td>
+									<td>Open highlighted thread</td>
+								</tr>
+								<tr>
+									<td><kbd>ctrl</kbd><kbd>q</kbd></td>
+									<td>Open at last page</td>
+								</tr>
+								<tr>
+									<td><kbd>alt</kbd><kbd>q</kbd></td>
+									<td>Open at first page</td>
+								</tr>
+								<tr>
+									<td><kbd>r</kbd></td>
+									<td>Start a new thread</td>
+								</tr>
+								<tr>
+									<td><kbd>o</kbd></td>
+									<td>Open all unread threads</td>
+								</tr>
+								<tr>
+									<td><kbd>f</kbd></td>
+									<td>Follow forum</td>
+								</tr>
+								<tr>
+									<td><kbd>m</kbd></td>
+									<td>Mark forum read</td>
+								</tr>
+								<tr>
+									<td><kbd>x</kbd></td>
+									<td>Show thread preview</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="docs-keygroup">
+						<p>Post Lists</p>
+						<table>
+							<tbody>
+								<tr>
+									<td><kbd>r</kbd></td>
+									<td>Add a new reply</td>
+								</tr>
+								<tr>
+									<td><kbd>q</kbd></td>
+									<td>Quote highlighted post</td>
+								</tr>
+								<tr>
+									<td><kbd>l</kbd></td>
+									<td>Go to latest unread on current page</td>
+								</tr>
+								<tr>
+									<td><kbd>t</kbd></td>
+									<td>Toggle thanks on highlighted post</td>
+								</tr>
+								<tr>
+									<td><kbd>f</kbd></td>
+									<td>Follow thread</td>
+								</tr>
+								<tr>
+									<td><kbd>1-9</kbd></td>
+									<td>Open the corresponding link</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+				`;
+			}
+			d.style.display = d.style.display == 'none' ? 'block' : 'none';
 		}
 	}
 }
