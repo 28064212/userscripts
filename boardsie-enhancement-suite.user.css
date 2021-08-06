@@ -322,3 +322,27 @@ a {
 .Panel-main {
 	display: none !important;
 }
+
+/* tooltips */
+
+.forum-threadlist-thread {
+	position: relative !important;
+}
+.tooltip-28064212 {
+	position: absolute;
+	left: 30%;
+	padding: 5px 10px;
+	width: max-content;
+	top: 0;
+	background-color: white;
+	color: rgb(51, 51, 51);
+	font-weight: normal;
+	border-radius: 5px;
+	z-index: 100;
+	max-width: 40vw;
+	border: 1px solid #3b5586;
+	max-height: 150px;
+	box-sizing: border-box;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
