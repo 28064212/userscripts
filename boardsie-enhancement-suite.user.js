@@ -7,8 +7,8 @@
 // @grant GM_getResourceText
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
-// @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent, . Use z/a to navigate thread lists, and enter to open threads
-// @version 1.0.1
+// @description Enhancements for Boards.ie
+// @version 1.0.2
 // ==/UserScript==
 
 let index = -1;
@@ -262,7 +262,7 @@ function keyShortcuts(key) {
 		else if (!ctrl && hl && code >= 48 && code <= 57) {
 			// 0-9: open links
 			code = code == 48 ? 10 : code - 49;
-			if (hl.classList.contains('postbit-wrapper') && hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)').length > 0 && hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code])
+			if (hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)').length > 0 && hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code])
 				window.open(hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code]);
 		}
 		else if (!ctrl && code == 77) {
