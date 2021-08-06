@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Left/right arrow keys for navigation in threads and forums, ctrl+left for parent, . Use z/a to navigate thread lists, and enter to open threads
-// @version 1.0
+// @version 1.0.1
 // ==/UserScript==
 
 let index = -1;
@@ -287,6 +287,8 @@ function keyShortcuts(key) {
 				document.querySelector('.richEditor-text').focus();
 				document.querySelector('.richEditor-text').scrollIntoView();
 			}
+			else if (document.querySelector(".BoxNewDiscussion a"))
+				document.querySelector(".BoxNewDiscussion a").click();
 		}
 		else if (!ctrl && code == 80 && hl && hl.getElementsByClassName('customspamlink').length > 0) {
 			// p - Report spammer (if https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Quick%20Spam%20Reporting.user.js also installed)
