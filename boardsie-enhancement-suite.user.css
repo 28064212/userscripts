@@ -319,10 +319,6 @@ a {
 .threadrow-container td {
 	padding: 5px 6px !important;
 }
-.Content.MainContent {
-	width: 85% !important;
-	flex-shrink: 1 !important;
-}
 .Panel-main {
 	display: block !important;
 }
