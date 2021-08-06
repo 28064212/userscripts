@@ -30,7 +30,7 @@ header, .BreadcrumbsBox {
 }
 .PageControls {
 	float: unset !important;
-	display: unset !important;
+	display: block !important;
 	margin: 0 !important;
 }
 .PageControls-filters, .PagerBefore, .NewDiscussion, .BoxNewDiscussion, .NumberedPager {
