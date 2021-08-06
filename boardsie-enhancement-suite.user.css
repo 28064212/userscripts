@@ -323,12 +323,12 @@ a {
 	display: none !important;
 }
 
-/* tooltips */
+/* previews */
 
 .forum-threadlist-thread {
 	position: relative !important;
 }
-.tooltip-28064212 {
+.preview-28064212 {
 	position: absolute;
 	left: 40px;
 	padding: 5px 10px;
@@ -346,6 +346,6 @@ a {
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
-.tooltip-28064212 p {
+.preview-28064212 p {
 	margin-bottom: 10px;
 }
