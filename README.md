@@ -1,2 +1,1 @@
-greasemonkey-scripts
-====================
+Collection of userscripts
