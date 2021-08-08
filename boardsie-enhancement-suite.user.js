@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.0.2
+// @version 1.1
 // ==/UserScript==
 
 let index = -1;
@@ -17,12 +17,23 @@ if (window.top == window.self) {
 	let css = GM_getResourceText("css");
 	GM_addStyle(css);
 	window.addEventListener('keydown', keyShortcuts, true);
-	unboldRead();
+
+	// some pages load titlebar contents lazily
+	let target = document.querySelector('#titleBar');
+	if (target && target.innerHTML == "") {
+		let observer = new MutationObserver(addCategoryListing);
+		observer.observe(target, { childList: true });
+	}
+	else if (target) {
+		addCategoryListing();
+	}
+
+	unboldReadThreads();
 	removeExternalLinkCheck();
-	addThanks();
-	addPreviews();
+	addThanksAfterPosts();
+	addThreadPreviews();
 }
-function unboldRead() {
+function unboldReadThreads() {
 	for (let t of document.querySelectorAll('.forum-threadlist-thread')) {
 		if (t.querySelector('.HasNew') == null && t.querySelector('.unread') != null)
 			t.querySelector('.unread').classList.remove('unread');
@@ -37,7 +48,7 @@ function removeExternalLinkCheck() {
 		}
 	}
 }
-function addPreviews() {
+function addThreadPreviews() {
 	let discussions = document.querySelectorAll('a.threadbit-threadlink');
 	for (let d of discussions) {
 		let loc = new URL(d.href).pathname.replace('/discussion/', '');
@@ -67,7 +78,7 @@ function addPreviews() {
 			.catch(error => { });
 	}
 }
-function addThanks() {
+function addThanksAfterPosts() {
 	let starter = document.querySelector('.ItemDiscussion');
 	if (starter && starter.querySelector('.HasCount')) {
 		let loc = window.location.pathname.replace('/discussion/', '');
@@ -126,6 +137,116 @@ function addThanks() {
 					comment.appendChild(thankscontainer);
 				})
 				.catch(error => { });
+		}
+	}
+}
+function addCategoryListing(mutationList, observer) {
+	let catLink = document.querySelector("a[to='/categories']");
+	if (catLink) {
+		if (observer) {
+			// category link is available, don't need to monitor anymore
+			observer.disconnect();
+		}
+		let categories = document.createElement("div");
+		categories.id = "categories-28064212";
+		categories.style.display = "none";
+		document.body.appendChild(categories);
+
+		catLink.parentElement.addEventListener("mouseover", function () {
+			categories.style.display = "block";
+			if (categories.innerHTML == "") {
+				let categoriesHeader = document.createElement("div");
+				categoriesHeader.id = "categories-header-28064212";
+				categories.appendChild(categoriesHeader);
+				fetch('/api/v2/categories/?limit=500&maxDepth=100')
+					.then(response => {
+						if (response.ok)
+							return response.json();
+						else
+							throw new Error(response.statusText);
+					})
+					.then(data => {
+						for (let d of data) {
+							let header = document.createElement("a");
+							header.dataset.id = d.categoryID;
+							header.innerText = d.name;
+							header.href = d.url;
+							categoriesHeader.appendChild(header);
+
+							let group = document.createElement("div");
+							group.classList.add("categories-group-28064212");
+							group.style.display = "none";
+							group.dataset.parent = d.categoryID;
+							categories.appendChild(group);
+
+							header.addEventListener("mouseover", function () {
+								// hide all groups, then display the correct one
+								for (let i of document.querySelectorAll(".categories-group-28064212"))
+									i.style.display = "none";
+								group.style.display = "grid";
+
+								// style current header, reset others
+								for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
+									i.style.backgroundColor = "";
+									i.style.color = "";
+								}
+								header.style.backgroundColor = "rgb(59, 85, 134)";
+								header.style.color = "white";
+							});
+
+							for (let i = 0; i < 6; i++) {
+								let division = document.createElement("div");
+								division.classList.add("categories-division-28064212");
+								division.dataset.depth = i;
+								group.appendChild(division);
+							}
+							if (d.children.length > 0)
+								populateCategoryChildren(d, d.categoryID, 0);
+						}
+					});
+			}
+		});
+		categories.addEventListener("mouseleave", function () {
+			categories.style.display = "none";
+			for (let i of document.querySelectorAll(".categories-group-28064212"))
+				i.style.display = "none";
+			for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
+				i.style.backgroundColor = "";
+				i.style.color = "";
+			}
+		});
+	}
+}
+function populateCategoryChildren(target, root, depth) {
+	for (let c of target.children) {
+		let childLink = document.createElement('a');
+		childLink.dataset.id = c.categoryID;
+		childLink.dataset.parent = c.parentCategoryID;
+		childLink.innerText = c.name;
+		childLink.href = c.url;
+		document.querySelector('.categories-group-28064212[data-parent="' + root + '"]').querySelectorAll('.categories-division-28064212')[depth].appendChild(childLink);
+		childLink.addEventListener("mouseover", function () {
+			for (let i = depth + 1; i < 6; i++) {
+				// hide items from divisions greater than depth
+				for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + i + '"] a'))
+					j.style.display = "none";
+				// remove style from links in divisions greater than or equal to depth
+				for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + (i - 1) + '"] a')) {
+					j.style.backgroundColor = "";
+					j.style.color = "";
+				}
+			}
+			childLink.style.backgroundColor = "rgb(59, 85, 134)";
+			childLink.style.color = "white";
+			for (let i of document.querySelectorAll('.categories-division-28064212 a[data-parent="' + c.categoryID + '"]'))
+				i.style.display = "block";
+		});
+		if (c.children.length > 0) {
+			let arrow = document.createElement("div");
+			arrow.innerText = "⇒";
+			arrow.style.float = "right";
+			childLink.appendChild(arrow);
+			populateCategoryChildren(c, root, depth + 1)
 		}
 	}
 }
