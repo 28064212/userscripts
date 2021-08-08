@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.1
+// @version 1.1.1
 // ==/UserScript==
 
 let index = -1;
@@ -152,9 +152,13 @@ function addCategoryListing(mutationList, observer) {
 		categories.style.display = "none";
 		document.body.appendChild(categories);
 
+		let loader = document.createElement("div");
+		loader.id = "categories-loader-28064212";
+		categories.appendChild(loader);
+
 		catLink.parentElement.addEventListener("mouseover", function () {
 			categories.style.display = "block";
-			if (categories.innerHTML == "") {
+			if (categories.querySelector("#categories-header-28064212") == null) {
 				let categoriesHeader = document.createElement("div");
 				categoriesHeader.id = "categories-header-28064212";
 				categories.appendChild(categoriesHeader);
@@ -167,6 +171,7 @@ function addCategoryListing(mutationList, observer) {
 					})
 					.then(data => {
 						for (let d of data) {
+							loader.style.display = "none";
 							let header = document.createElement("a");
 							header.dataset.id = d.categoryID;
 							header.innerText = d.name;
