@@ -325,13 +325,13 @@ a {
 
 /* previews */
 
-.forum-threadlist-thread {
+.forum-threadlist-thread, .threadrow-container td {
 	position: relative !important;
 }
-.preview-28064212 {
+.preview-28064212, .threadrow-container div.preview-28064212 {
 	position: absolute;
 	left: 40px;
-	padding: 5px 10px;
+	padding: 5px 10px !important;
 	width: max-content;
 	top: 40px;
 	background-color: white;
