@@ -19,11 +19,15 @@ header, .BreadcrumbsBox {
 	padding-right: 15px !important;
 }
 .Content.MainContent {
-	width: 100% !important;
-	flex-shrink: 0 !important;
+	width: auto !important;
+	flex-grow: 1 !important;
 }
 .Panel-main {
-	display: none !important;
+	margin-top: 0 !important;
+	top: 0 !important;
+}
+.Panel-main > *{
+	margin-top: 0 !important;
 }
 .forum-threadlist-wrapper {
 	margin-top: 0 !important;
@@ -318,9 +322,6 @@ a {
 }
 .threadrow-container td {
 	padding: 5px 6px !important;
-}
-.Panel-main {
-	display: none !important;
 }
 
 /* previews */
