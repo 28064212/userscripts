@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2.2
+// @version 1.2.3
 // ==/UserScript==
 
 let index = -1;
@@ -54,7 +54,8 @@ function addThreadPreviews() {
 	for (let l of links) {
 		let path = new URL(l.href).pathname.replace('/discussion/', '');
 		let id = path.slice(0, path.indexOf('/'));
-		discussions.push(id);
+		if(id != "")
+			discussions.push(id);
 	}
 	fetch('https://www.boards.ie/api/v2/discussions/?limit=500&discussionID=' + discussions.join(','))
 		.then(response => {
