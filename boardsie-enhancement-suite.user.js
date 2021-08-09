@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2.1
+// @version 1.2.2
 // ==/UserScript==
 
 let index = -1;
@@ -49,45 +49,53 @@ function removeExternalLinkCheck() {
 	}
 }
 function addThreadPreviews() {
-	//let discussions = document.querySelectorAll('a.threadbit-threadlink, .threadlink-wrapper a');
-	let discussions = document.querySelectorAll('a.threadbit-threadlink');
-	for (let d of discussions) {
-		let loc = new URL(d.href).pathname.replace('/discussion/', '');
-		let id = loc.slice(0, loc.indexOf('/'));
-		fetch('/api/v2/discussions/' + id + '/')
-			.then(response => {
-				if (response.ok)
-					return response.json();
-				else
-					throw new Error(response.statusText);
-			})
-			.then(data => {
-				if (data.body) {
-					let preview = document.createElement("div");
-					let parent = null;
-					if (d.parentElement.classList.contains("threadlink-wrapper")) {
-						parent = d.parentElement.parentElement;
-						parent.appendChild(preview);
-						preview.parentElement.title = '';
-					}
-					else {
-						parent = d.parentElement;
-						parent.appendChild(preview);
-					}
-					preview.classList.add("preview-28064212");
-					preview.innerHTML = data.body;
-					preview.style.display = "none";
-					preview.style.top = (parent.offsetHeight + 1) + 'px';
-					d.addEventListener('mouseover', function (e) {
-						preview.style.display = "block";
-					});
-					d.addEventListener('mouseout', function (e) {
-						preview.style.display = "none";
-					});
-				}
-			})
-			.catch(error => { });
+	let links = document.querySelectorAll('a.threadbit-threadlink, .threadlink-wrapper a');
+	let discussions = [];
+	for (let l of links) {
+		let path = new URL(l.href).pathname.replace('/discussion/', '');
+		let id = path.slice(0, path.indexOf('/'));
+		discussions.push(id);
 	}
+	fetch('https://www.boards.ie/api/v2/discussions/?limit=500&discussionID=' + discussions.join(','))
+		.then(response => {
+			if (response.ok)
+				return response.json();
+			else
+				throw new Error(response.statusText);
+		})
+		.then(data => {
+			for (let l of links) {
+				let path = new URL(l.href).pathname.replace('/discussion/', '');
+				let id = path.slice(0, path.indexOf('/'));
+				for (let d of data) {
+					if (d.discussionID == id) {
+						let preview = document.createElement("div");
+						let parent = null;
+						if (l.parentElement.classList.contains("threadlink-wrapper")) {
+							parent = l.parentElement.parentElement;
+							parent.appendChild(preview);
+							preview.parentElement.title = '';
+						}
+						else {
+							parent = l.parentElement;
+							parent.appendChild(preview);
+						}
+						preview.classList.add("preview-28064212");
+						preview.innerHTML = d.body ? d.body : "";
+						preview.style.display = "none";
+						preview.style.top = (parent.offsetHeight + 1) + 'px';
+						l.addEventListener('mouseover', function (e) {
+							preview.style.display = "block";
+						});
+						l.addEventListener('mouseout', function (e) {
+							preview.style.display = "none";
+						});
+					}
+				}
+			}
+		})
+		.catch(error => { });
+
 }
 function addThanksAfterPosts() {
 	let starter = document.querySelector('.ItemDiscussion');
