@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2
+// @version 1.2.1
 // ==/UserScript==
 
 let index = -1;
@@ -49,7 +49,8 @@ function removeExternalLinkCheck() {
 	}
 }
 function addThreadPreviews() {
-	let discussions = document.querySelectorAll('a.threadbit-threadlink, .threadlink-wrapper a');
+	//let discussions = document.querySelectorAll('a.threadbit-threadlink, .threadlink-wrapper a');
+	let discussions = document.querySelectorAll('a.threadbit-threadlink');
 	for (let d of discussions) {
 		let loc = new URL(d.href).pathname.replace('/discussion/', '');
 		let id = loc.slice(0, loc.indexOf('/'));
