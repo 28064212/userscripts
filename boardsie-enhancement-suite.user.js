@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.1.1
+// @version 1.2
 // ==/UserScript==
 
 let index = -1;
@@ -49,7 +49,7 @@ function removeExternalLinkCheck() {
 	}
 }
 function addThreadPreviews() {
-	let discussions = document.querySelectorAll('a.threadbit-threadlink');
+	let discussions = document.querySelectorAll('a.threadbit-threadlink, .threadlink-wrapper a');
 	for (let d of discussions) {
 		let loc = new URL(d.href).pathname.replace('/discussion/', '');
 		let id = loc.slice(0, loc.indexOf('/'));
@@ -62,16 +62,26 @@ function addThreadPreviews() {
 			})
 			.then(data => {
 				if (data.body) {
-					let div = document.createElement("div");
-					d.parentElement.appendChild(div);
-					div.classList.add("preview-28064212");
-					div.innerHTML = data.body;
-					div.style.display = "none";
+					let preview = document.createElement("div");
+					let parent = null;
+					if (d.parentElement.classList.contains("threadlink-wrapper")) {
+						parent = d.parentElement.parentElement;
+						parent.appendChild(preview);
+						preview.parentElement.title = '';
+					}
+					else {
+						parent = d.parentElement;
+						parent.appendChild(preview);
+					}
+					preview.classList.add("preview-28064212");
+					preview.innerHTML = data.body;
+					preview.style.display = "none";
+					preview.style.top = (parent.offsetHeight + 1) + 'px';
 					d.addEventListener('mouseover', function (e) {
-						e.target.parentElement.querySelector(".preview-28064212").style.display = "block";
+						preview.style.display = "block";
 					});
 					d.addEventListener('mouseout', function (e) {
-						e.target.parentElement.querySelector(".preview-28064212").style.display = "none";
+						preview.style.display = "none";
 					});
 				}
 			})
