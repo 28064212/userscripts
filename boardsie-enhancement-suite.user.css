@@ -99,7 +99,7 @@ header, .BreadcrumbsBox {
 .MessageList {
 	margin-bottom: 0 !important;
 }
-.embedExternal {
+.embedExternal[class*="quoteEmbed"], .embedExternal[class*="embedLink"] {
 	margin: 0 !important;
 	width: 100% !important;
 	clear: none !important;
