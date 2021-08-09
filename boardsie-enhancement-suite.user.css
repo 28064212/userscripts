@@ -8,7 +8,7 @@ header, .BreadcrumbsBox {
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
 }
-[class^="vanilla-"][class$="-container-fullGutter-container-fullGutter-container-fullGutter"], .Breadcrumbs {
+[class$="container-fullGutter"], .Breadcrumbs {
 	max-width: unset !important;
 	padding-left: 15px !important;
 	padding-right: 15px !important;
@@ -104,13 +104,13 @@ header, .BreadcrumbsBox {
 	width: 100% !important;
 	clear: none !important;
 }
-.vanilla-d7cut4-collapsableContent-heightContainer {
+[class$="collapsableContent-heightContainer"] {
 	height: auto !important;
 }
-.vanilla-toe1gy-collapsableContent-gradient {
+[class$="collapsableContent-gradient"] {
 	opacity: 0 !important;
 }
-.vanilla-1vww8zj-collapsableContent-footer {
+[class$="collapsableContent-footer"] {
 	display: none !important;
 }
 .Reactions {
