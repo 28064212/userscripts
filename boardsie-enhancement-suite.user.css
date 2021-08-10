@@ -26,7 +26,7 @@ header, .BreadcrumbsBox {
 	margin-top: 0 !important;
 	top: 0 !important;
 }
-.Panel-main > *{
+.Panel-main>* {
 	margin-top: 0 !important;
 }
 .forum-threadlist-wrapper {
@@ -169,8 +169,8 @@ header, .BreadcrumbsBox {
 .Category {
 	float: right !important;
 }
-.Frame-content .HomepageTitle {
-	display: block !important;
+[class*="categoryFollowDropDown"] {
+	float: right
 }
 
 /* javascript requirements */
@@ -424,4 +424,11 @@ a {
 	100% {
 		transform: rotate(360deg);
 	}
+}
+
+/* alerts */
+
+.alert-28064212 {
+	opacity: 1;
+	transition: opacity 2000ms linear;
 }
