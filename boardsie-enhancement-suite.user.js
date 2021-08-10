@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2.4
+// @version 1.2.5
 // ==/UserScript==
 
 let index = -1;
@@ -18,9 +18,9 @@ if (window.top == window.self) {
 	GM_addStyle(css);
 	window.addEventListener('keydown', keyShortcuts, true);
 
-	// some pages load titlebar contents lazily
 	let target = document.querySelector('#titleBar');
 	if (target && target.innerHTML == "") {
+		// some pages load titlebar contents lazily
 		let observer = new MutationObserver(addCategoryListing);
 		observer.observe(target, { childList: true });
 	}
@@ -57,7 +57,7 @@ function addThreadPreviews() {
 		if (id != "")
 			discussions.push(id);
 	}
-	fetch('https://www.boards.ie/api/v2/discussions/?limit=500&discussionID=' + discussions.join(','))
+	fetch('/api/v2/discussions/?limit=500&discussionID=' + discussions.join(','))
 		.then(response => {
 			if (response.ok)
 				return response.json();
@@ -101,9 +101,8 @@ function addThreadPreviews() {
 function addThanksAfterPosts() {
 	let starter = document.querySelector('.ItemDiscussion');
 	if (starter && starter.querySelector('.HasCount')) {
-		let loc = window.location.pathname.replace('/discussion/', '');
-		let starterid = loc.slice(0, loc.indexOf('/'));
-		fetch('/api/v2/discussions/' + starterid + '/reactions?limit=100&type=Like')
+		let discussionid = gdn.meta.DiscussionID;
+		fetch('/api/v2/discussions/' + discussionid + '/reactions?limit=100&type=Like')
 			.then(response => {
 				if (response.ok)
 					return response.json();
@@ -420,8 +419,13 @@ function keyShortcuts(key) {
 		}
 		else if (!ctrl && code == 70) {
 			// f - follow/unfollow
-			if (document.querySelector('a.Bookmark'))
+			if (document.querySelector('a.Bookmark')) {
+				if (document.querySelector('a.Bookmarked'))
+					createAlert("Thread unfollowed");
+				else
+					createAlert("Thread followed");
 				document.querySelector('a.Bookmark').click();
+			}
 			else if (document.querySelector("button[aria-label='Follow'], button[aria-label='Unfollow']")) {
 				let category = document.querySelector('meta[name=catid]').content;
 				let user = gdn.meta.ui.currentUser.userID;
