@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2.3
+// @version 1.2.4
 // ==/UserScript==
 
 let index = -1;
@@ -54,7 +54,7 @@ function addThreadPreviews() {
 	for (let l of links) {
 		let path = new URL(l.href).pathname.replace('/discussion/', '');
 		let id = path.slice(0, path.indexOf('/'));
-		if(id != "")
+		if (id != "")
 			discussions.push(id);
 	}
 	fetch('https://www.boards.ie/api/v2/discussions/?limit=500&discussionID=' + discussions.join(','))
@@ -275,6 +275,26 @@ function populateCategoryChildren(target, root, depth) {
 		}
 	}
 }
+function createAlert(msg) {
+	for (let a of document.querySelectorAll(".alert-28064212")) {
+		a.style.opacity = 0;
+	}
+	let alertBox = document.querySelector(".InformMessages");
+	if (alertBox == null) {
+		alertBox = document.createElement("div");
+		alertBox.classList.add("InformMessages");
+		document.body.appendChild(alertBox);
+	}
+	let alert = document.createElement("div");
+	alert.className = "InformWrapper Dismissable AutoDismiss alert-28064212";
+	alert.innerHTML = `
+<div role="alert" class="InformMessage">
+<span aria-label="polite" class="InformMessageBody">
+	<div class="Title">` + msg + `</div>
+</span>
+</div>`;
+	alertBox.appendChild(alert);
+}
 function isElementInViewport(el) {
 	let rect = el.getBoundingClientRect();
 	return (
@@ -402,8 +422,34 @@ function keyShortcuts(key) {
 			// f - follow/unfollow
 			if (document.querySelector('a.Bookmark'))
 				document.querySelector('a.Bookmark').click();
-			else if (document.querySelector('a.followButton'))
-				document.querySelector('a.followButton').click();
+			else if (document.querySelector("button[aria-label='Follow'], button[aria-label='Unfollow']")) {
+				let category = document.querySelector('meta[name=catid]').content;
+				let user = gdn.meta.ui.currentUser.userID;
+				fetch("/api/v2/categories/" + category + "/preferences/" + user)
+					.then(response => {
+						if (response.ok)
+							return response.json();
+						else
+							throw new Error(response.statusText);
+					})
+					.then(data => {
+						let toggle = data.postNotifications ? null : "follow";
+						fetch("/api/v2/categories/" + category + "/preferences/" + user, {
+							method: "PATCH", body: JSON.stringify({ postNotifications: toggle }), headers: { "Content-type": "application/json; charset=UTF-8" }
+						})
+							.then(response => {
+								if (response.ok) {
+									//alert
+									createAlert(toggle == "follow" ? "Forum followed" : "Forum unfollowed");
+									return response.json();
+								}
+								else
+									throw new Error(response.statusText);
+							})
+							.catch(e => console.log(e));
+					})
+					.catch(e => console.log(e));
+			}
 		}
 		else if (!ctrl && hl && code >= 48 && code <= 57) {
 			// 0-9: open links
@@ -413,14 +459,10 @@ function keyShortcuts(key) {
 		}
 		else if (!ctrl && code == 77) {
 			// m - Mark forum read
-			let title = document.querySelector('.HomepageTitle a');
-			if (title) {
-				let transientKey = title.href.substring(title.href.lastIndexOf('/') + 1, title.length);
-				let category = document.querySelector('meta[name=catid]').content;
-				fetch("/category/markread?categoryid=" + category + "&tkey=" + transientKey)
-					.then(alert('Marked read, close dialog to refresh'))
-					.then(location.reload());
-			}
+			let transientKey = gdn.meta.TransientKey;
+			let category = document.querySelector('meta[name=catid]').content;
+			fetch("/category/markread?categoryid=" + category + "&tkey=" + transientKey)
+				.then(createAlert("Forum marked read, refresh to update"));
 		}
 		else if (!ctrl && code == 84 && hl && hl.querySelector('.ReactButton-Like')) {
 			// t - toggle thanks of highlighted post
