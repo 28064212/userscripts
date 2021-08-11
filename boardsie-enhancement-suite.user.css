@@ -313,6 +313,7 @@ body {
 
 .forum-threadlist-thread, .threadrow-container td {
 	position: relative !important;
+	background-clip: padding-box !important;
 }
 .preview-28064212, .threadrow-container div.preview-28064212 {
 	position: absolute;
