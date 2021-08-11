@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2.6
+// @version 1.2.7
 // ==/UserScript==
 
 let index = -1;
@@ -71,20 +71,24 @@ function addThreadPreviews() {
 				for (let d of data) {
 					if (d.discussionID == id) {
 						let preview = document.createElement("div");
-						let parent = null;
-						if (l.parentElement.classList.contains("threadlink-wrapper")) {
-							parent = l.parentElement.parentElement;
-							parent.appendChild(preview);
-							preview.parentElement.title = '';
-						}
-						else {
-							parent = l.parentElement;
-							parent.appendChild(preview);
-						}
 						preview.classList.add("preview-28064212");
 						preview.innerHTML = d.body ? d.body : "";
 						preview.style.display = "none";
-						preview.style.top = (parent.offsetHeight + 1) + 'px';
+						let parent = null;
+						if (l.parentElement.classList.contains("threadlink-wrapper")) {
+							parent = l.parentElement.parentElement;
+							preview.style.top = '28px';
+							parent.appendChild(preview);
+							preview.parentElement.title = '';
+							if(d.unread == false) {
+								l.style.fontWeight = "normal";
+							}
+						}
+						else {
+							parent = l.parentElement;
+							preview.style.top = '46px';
+							parent.appendChild(preview);
+						}
 						l.addEventListener('mouseover', function (e) {
 							preview.style.display = "block";
 						});
