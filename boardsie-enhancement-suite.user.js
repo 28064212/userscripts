@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2.5
+// @version 1.2.6
 // ==/UserScript==
 
 let index = -1;
@@ -99,65 +99,49 @@ function addThreadPreviews() {
 
 }
 function addThanksAfterPosts() {
-	let starter = document.querySelector('.ItemDiscussion');
-	if (starter && starter.querySelector('.HasCount')) {
-		let discussionid = gdn.meta.DiscussionID;
-		fetch('/api/v2/discussions/' + discussionid + '/reactions?limit=100&type=Like')
-			.then(response => {
-				if (response.ok)
-					return response.json();
-				else
-					throw new Error(response.statusText);
-			})
-			.then(data => {
-				let thankscontainer = document.createElement('div');
-				thankscontainer.classList.add('thanks-28064212')
-				let thanksdiv = document.createElement('div');
-				let thankersdiv = document.createElement('div');
-				let thankers = [];
-				for (let d of data) {
-					thankers.push(d.user.name);
-				}
-				thankersdiv.innerText = thankers.sort(function (a, b) {
-					return a.toLowerCase().localeCompare(b.toLowerCase());
-				}).join(', ');
-				thanksdiv.innerText = "Thanks (" + thankers.length + ")";
-				thankscontainer.appendChild(thanksdiv);
-				thankscontainer.appendChild(thankersdiv);
-				starter.appendChild(thankscontainer);
-			})
-			.catch(error => { });
-	}
-	for (let comment of document.querySelectorAll('.ItemComment ')) {
-		if (comment.querySelector('.HasCount')) {
-			let id = comment.id.replace('Comment_', '');
-			fetch('/api/v2/comments/' + id + '/reactions?limit=100&type=Like')
-				.then(response => {
-					if (response.ok)
-						return response.json();
-					else
-						throw new Error(response.statusText);
-				})
-				.then(data => {
-					let thankscontainer = document.createElement('div');
-					thankscontainer.classList.add('thanks-28064212')
-					let thanksdiv = document.createElement('div');
-					let thankersdiv = document.createElement('div');
-					let thankers = [];
-					for (let d of data) {
-						thankers.push(d.user.name);
-					}
-					thankersdiv.innerText = thankers.sort(function (a, b) {
-						return a.toLowerCase().localeCompare(b.toLowerCase());
-					}).join(', ');
-					thanksdiv.innerText = "Thanks (" + thankers.length + ")";
-					thankscontainer.appendChild(thanksdiv);
-					thankscontainer.appendChild(thankersdiv);
-					comment.appendChild(thankscontainer);
-				})
-				.catch(error => { });
+	for (let post of document.querySelectorAll('.ItemComment, .ItemDiscussion')) {
+		if (post.classList.contains('ItemDiscussion') && post.querySelector('.HasCount')) {
+			let id = gdn.meta.DiscussionID;
+			appendThanks(post, 'discussions', id);
+		}
+		else if (post.querySelector('.HasCount')) {
+			let id = post.id.replace('Comment_', '');
+			appendThanks(post, 'comments', id);
 		}
 	}
+}
+function appendThanks(element, type, id) {
+	fetch('/api/v2/' + type + '/' + id + '/reactions?limit=100&type=Like')
+		.then(response => {
+			if (response.ok)
+				return response.json();
+			else
+				throw new Error(response.statusText);
+		})
+		.then(data => {
+			let thankscontainer = document.createElement('div');
+			thankscontainer.classList.add('thanks-28064212')
+			element.appendChild(thankscontainer);
+
+			let thankscount = document.createElement('div');
+			thankscount.innerText = "Thanks (" + data.length + ")";
+			thankscontainer.appendChild(thankscount);
+
+			data.sort(function (a, b) {
+				return a.user.name.toLowerCase().localeCompare(b.user.name.toLowerCase());
+			});
+			let thankers = document.createElement('div');
+			thankscontainer.appendChild(thankers);
+			for (let d of data) {
+				let link = document.createElement('a');
+				link.href = d.user.url;
+				link.innerHTML = d.user.name;
+				thankers.appendChild(link);
+				thankers.innerHTML += ", ";
+			}
+			thankers.innerHTML = thankers.innerHTML.slice(0, -2);
+		})
+		.catch(error => { console.log(error) });
 }
 function addCategoryListing(mutationList, observer) {
 	let catLink = document.querySelector("a[to='/categories']");
@@ -169,6 +153,7 @@ function addCategoryListing(mutationList, observer) {
 		let categories = document.createElement("div");
 		categories.id = "categories-28064212";
 		categories.style.display = "none";
+		categories.tabIndex = -1;
 		document.body.appendChild(categories);
 
 		let loader = document.createElement("div");
@@ -492,6 +477,12 @@ function keyShortcuts(key) {
 			if (hl.querySelector(".preview-28064212"))
 				hl.querySelector(".preview-28064212").style.display = showpreviews ? "block" : "none";
 		}
+		else if (!ctrl && code == 67) {
+			// c - display category menu
+			window.scrollTo(0, 0);
+			document.querySelector("a[to='/categories']").parentElement.dispatchEvent(new Event('mouseover'));
+			document.querySelector("#categories-28064212").focus();
+		}
 		else if (shift && code == 191) {
 			// ? - show/hide documentation
 			let d = document.querySelector('#docs-28064212');
@@ -535,6 +526,10 @@ function keyShortcuts(key) {
 								<tr>
 									<td><kbd>ctrl</kbd><kbd>←</kbd></td>
 									<td>Go to parent</td>
+								</tr>
+								<tr>
+									<td><kbd>c</kbd></td>
+									<td>Display category menu</td>
 								</tr>
 								<tr>
 									<td><kbd>ctrl</kbd><kbd>space</kbd></td>
