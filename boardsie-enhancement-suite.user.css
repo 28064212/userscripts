@@ -145,6 +145,9 @@ header, .BreadcrumbsBox {
 .Signature {
 	padding: 0 !important;
 }
+.userContent h2[class$="embed-title"] {
+	white-space: normal !important;
+}
 
 /* forums */
 
