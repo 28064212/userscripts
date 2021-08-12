@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.2.7
+// @version 1.3
 // ==/UserScript==
 
 let index = -1;
@@ -18,13 +18,13 @@ if (window.top == window.self) {
 	GM_addStyle(css);
 	window.addEventListener('keydown', keyShortcuts, true);
 
-	let target = document.querySelector('#titleBar');
-	if (target && target.innerHTML == "") {
+	let titleBar = document.querySelector('#titleBar');
+	if (titleBar && titleBar.innerHTML == "") {
 		// some pages load titlebar contents lazily
 		let observer = new MutationObserver(addCategoryListing);
-		observer.observe(target, { childList: true });
+		observer.observe(titleBar, { childList: true });
 	}
-	else if (target) {
+	else if (titleBar) {
 		addCategoryListing();
 	}
 
@@ -32,6 +32,7 @@ if (window.top == window.self) {
 	removeExternalLinkCheck();
 	addThanksAfterPosts();
 	addThreadPreviews();
+	addBookmarkStatusToComments();
 }
 function unboldReadThreads() {
 	for (let t of document.querySelectorAll('.forum-threadlist-thread')) {
@@ -57,50 +58,52 @@ function addThreadPreviews() {
 		if (id != "")
 			discussions.push(id);
 	}
-	fetch('/api/v2/discussions/?limit=500&discussionID=' + discussions.join(','))
-		.then(response => {
-			if (response.ok)
-				return response.json();
-			else
-				throw new Error(response.statusText);
-		})
-		.then(data => {
-			for (let l of links) {
-				let path = new URL(l.href).pathname.replace('/discussion/', '');
-				let id = path.slice(0, path.indexOf('/'));
-				for (let d of data) {
-					if (d.discussionID == id) {
-						let preview = document.createElement("div");
-						preview.classList.add("preview-28064212");
-						preview.innerHTML = d.body ? d.body : "";
-						preview.style.display = "none";
-						let parent = null;
-						if (l.parentElement.classList.contains("threadlink-wrapper")) {
-							parent = l.parentElement.parentElement;
-							preview.style.top = '28px';
-							parent.appendChild(preview);
-							preview.parentElement.title = '';
-							if(d.unread == false) {
-								l.style.fontWeight = "normal";
-							}
-						}
-						else {
-							parent = l.parentElement;
-							preview.style.top = '46px';
-							parent.appendChild(preview);
-						}
-						l.addEventListener('mouseover', function (e) {
-							preview.style.display = "block";
-						});
-						l.addEventListener('mouseout', function (e) {
+	if (discussions.length > 0) {
+		fetch('/api/v2/discussions/?limit=500&discussionID=' + discussions.join(','))
+			.then(response => {
+				if (response.ok)
+					return response.json();
+				else
+					throw new Error(response.statusText);
+			})
+			.then(data => {
+				for (let l of links) {
+					let path = new URL(l.href).pathname.replace('/discussion/', '');
+					let id = path.slice(0, path.indexOf('/'));
+					for (let d of data) {
+						if (d.discussionID == id) {
+							let preview = document.createElement("div");
+							preview.classList.add("preview-28064212");
+							preview.innerHTML = d.body ? d.body : "";
 							preview.style.display = "none";
-						});
+							let parent = null;
+							if (l.parentElement.classList.contains("threadlink-wrapper")) {
+								parent = l.parentElement.parentElement;
+								preview.style.top = '28px';
+								parent.appendChild(preview);
+								preview.parentElement.title = '';
+								// unbolds read threads on homepage
+								if (d.unread == false) {
+									l.style.fontWeight = "normal";
+								}
+							}
+							else {
+								parent = l.parentElement;
+								preview.style.top = '46px';
+								parent.appendChild(preview);
+							}
+							l.addEventListener('mouseover', function (e) {
+								preview.style.display = "block";
+							});
+							l.addEventListener('mouseout', function (e) {
+								preview.style.display = "none";
+							});
+						}
 					}
 				}
-			}
-		})
-		.catch(error => { });
-
+			})
+			.catch(error => console.log(error));
+	}
 }
 function addThanksAfterPosts() {
 	for (let post of document.querySelectorAll('.ItemComment, .ItemDiscussion')) {
@@ -145,7 +148,57 @@ function appendThanks(element, type, id) {
 			}
 			thankers.innerHTML = thankers.innerHTML.slice(0, -2);
 		})
-		.catch(error => { console.log(error) });
+		.catch(error => console.log(error));
+}
+function addBookmarkStatusToComments() {
+	let commentElements = document.querySelectorAll('.Profile .Comments .Item');
+	let commentList = [];
+	for (let c of commentElements)
+		commentList.push(c.id.replace("Comment_", ""));
+	if (commentList.length > 0) {
+		fetch('/api/v2/comments/?limit=500&commentId=' + commentList.join(','))
+			.then(response => {
+				if (response.ok)
+					return response.json();
+				else
+					throw new Error(response.statusText);
+			})
+			.then(commentData => {
+				let discussionList = [];
+				for (let d of commentData)
+					discussionList.push(d.discussionID);
+				if (discussionList.length > 0) {
+					fetch('/api/v2/discussions/?limit=500&discussionID=' + discussionList.join(','))
+						.then(response => {
+							if (response.ok)
+								return response.json();
+							else
+								throw new Error(response.statusText);
+						})
+						.then(discussionData => {
+							for (let c of commentElements) {
+								let id = c.id.replace("Comment_", "");
+								let discussion = commentData.find(item => item.commentID == id).discussionID;
+								let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+								svg.setAttribute("viewBox", "0 0 12.733 16.394");
+								svg.innerHTML = '<title>Bookmark</title><path class="svgBookmark-mainPath" stroke-width="2" d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"></path>';
+								svg.style.height = "16px";
+								svg.style.width = "12px";
+								svg.style.float = "right";
+								svg.style.marginLeft = "10px";
+								svg.querySelector('path').style.stroke = "rgb(59, 85, 134)";
+								if (discussionData.find(item => item.discussionID == discussion).bookmarked)
+									svg.querySelector('path').style.fill = "rgb(59, 85, 134)";
+								else
+									svg.querySelector('path').style.fill = "none";
+								c.querySelector(".ItemContent").insertBefore(svg, c.querySelector(".ItemContent").firstChild);
+							}
+						})
+						.catch(error => console.log(error));;
+				}
+			})
+			.catch(error => console.log(error));
+	}
 }
 function addCategoryListing(mutationList, observer) {
 	let catLink = document.querySelector("a[to='/categories']");
@@ -178,6 +231,7 @@ function addCategoryListing(mutationList, observer) {
 							throw new Error(response.statusText);
 					})
 					.then(data => {
+						data.unshift({ "categoryID": 0, "name": "Followed", "url": "" });
 						for (let d of data) {
 							loader.style.display = "none";
 							let header = document.createElement("a");
@@ -207,16 +261,38 @@ function addCategoryListing(mutationList, observer) {
 								header.style.color = "white";
 							});
 
-							for (let i = 0; i < 6; i++) {
+							if (d.categoryID == 0) {
+								//followed
 								let division = document.createElement("div");
 								division.classList.add("categories-division-28064212");
-								division.dataset.depth = i;
+								division.dataset.depth = 0;
 								group.appendChild(division);
+								let followed = [];
+								populateFollowed(data, followed);
+								followed.sort(function (a, b) {
+									return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+								});
+								for (let f of followed) {
+									let childLink = document.createElement('a');
+									childLink.dataset.id = f.categoryID;
+									childLink.innerText = f.name;
+									childLink.href = f.url;
+									division.appendChild(childLink);
+								}
 							}
-							if (d.children.length > 0)
-								populateCategoryChildren(d, d.categoryID, 0);
+							else {
+								for (let i = 0; i < 6; i++) {
+									let division = document.createElement("div");
+									division.classList.add("categories-division-28064212");
+									division.dataset.depth = i;
+									group.appendChild(division);
+								}
+								if (d.children.length > 0)
+									populateCategoryChildren(d, d.categoryID, 0);
+							}
 						}
-					});
+					})
+					.catch(error => console.log(error));
 			}
 		});
 		categories.addEventListener("mouseleave", function () {
@@ -228,6 +304,14 @@ function addCategoryListing(mutationList, observer) {
 				i.style.color = "";
 			}
 		});
+	}
+}
+function populateFollowed(categories, followed) {
+	for (let c of categories) {
+		if (c.followed)
+			followed.push({ "categoryID": c.categoryID, "name": c.name, "url": c.url });
+		if (c.children && c.children.length > 0)
+			populateFollowed(c.children, followed)
 	}
 }
 function populateCategoryChildren(target, root, depth) {
