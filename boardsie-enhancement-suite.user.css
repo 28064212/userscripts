@@ -359,7 +359,7 @@ body {
 }
 #categories-header-28064212 {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
 	grid-column-gap: 10px;
 	text-align: center;
 }
@@ -373,6 +373,10 @@ body {
 }
 .categories-group-28064212 a {
 	padding: 10px;
+}
+#categories-28064212 .categories-group-28064212[data-parent="0"] a:hover {
+	background-color: rgb(59, 85, 134);
+	color: white;
 }
 .categories-division-28064212 {
 	border-right: 1px dashed rgb(59, 85, 134);
