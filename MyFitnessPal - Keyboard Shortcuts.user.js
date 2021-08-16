@@ -6,8 +6,8 @@
 // @include /^https?://(www\.)?myfitnesspal\.com/user/.*/diary/add\?.*/
 // @match https://www.myfitnesspal.com/food/diary*
 // @match https://www.myfitnesspal.com/food/search
-// @version 1.2.2
-// @description	a/z for up/down, q to select, w to select quantity
+// @version 1.3
+// @description	a/z for up/down, q to select, w to select quantity, shift+d delete all
 // ==/UserScript==
 
 //from: https://stackoverflow.com/a/46285637
@@ -59,6 +59,7 @@ function keyShortcuts(key) {
 	var code = key.keyCode;
 	var ctrl = key.ctrlKey;
 	var alt = key.altKey;
+	var shift = key.shiftKey;
 	var intext = (document.activeElement.nodeName == 'TEXTAREA' || (document.activeElement.nodeName == 'INPUT' && document.activeElement.type != "checkbox"));
 	var hl = document.getElementsByClassName('highlight436255')[0];
 	if (ctrl && (code == 32)) {
@@ -67,7 +68,7 @@ function keyShortcuts(key) {
 	else if (!intext && (code == 37)) {
 		var evt = document.createEvent("MouseEvents");
 		evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-		if(window.location.pathname.startsWith("/food/diary")) {
+		if (window.location.pathname.startsWith("/food/diary")) {
 			document.querySelector(".prev").dispatchEvent(evt);
 		}
 		else if (document.getElementById('recent').style.display != 'none') {
@@ -95,7 +96,7 @@ function keyShortcuts(key) {
 	else if (!intext && (code == 39)) {
 		var evt = document.createEvent("MouseEvents");
 		evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-		if(window.location.pathname.startsWith("/food/diary")) {
+		if (window.location.pathname.startsWith("/food/diary")) {
 			document.querySelector(".next").dispatchEvent(evt);
 		}
 		else if (document.getElementById('recent').style.display != 'none') {
@@ -193,6 +194,13 @@ function keyShortcuts(key) {
 		// w - focus textbox
 		hl.getElementsByClassName("text")[0].select();
 		key.preventDefault();
+	}
+	else if (!intext && shift && code == 68) {
+		// shift+d - delete all
+		let links = document.querySelectorAll('.delete a');
+		if (links.length > 0) {
+			for (let l of links) { window.open(l.href) }
+		}
 	}
 }
 function isElementInViewport(el) {
