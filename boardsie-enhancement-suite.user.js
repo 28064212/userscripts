@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.3
+// @version 1.3.1
 // ==/UserScript==
 
 let index = -1;
@@ -32,7 +32,13 @@ if (window.top == window.self) {
 	removeExternalLinkCheck();
 	addThanksAfterPosts();
 	addThreadPreviews();
+
 	addBookmarkStatusToComments();
+	let profileComments = document.querySelector('.Profile .Comments.DataList');
+	if (profileComments) {
+		let observer = new MutationObserver(addBookmarkStatusToComments);
+		observer.observe(profileComments, { childList: true, subtree: false });
+	}
 }
 function unboldReadThreads() {
 	for (let t of document.querySelectorAll('.forum-threadlist-thread')) {
@@ -151,7 +157,7 @@ function appendThanks(element, type, id) {
 		.catch(error => console.log(error));
 }
 function addBookmarkStatusToComments() {
-	let commentElements = document.querySelectorAll('.Profile .Comments .Item');
+	let commentElements = document.querySelectorAll('.Profile .Comments .Item:not(.bookmark-status-28064212)');
 	let commentList = [];
 	for (let c of commentElements)
 		commentList.push(c.id.replace("Comment_", ""));
@@ -192,6 +198,7 @@ function addBookmarkStatusToComments() {
 								else
 									svg.querySelector('path').style.fill = "none";
 								c.querySelector(".ItemContent").insertBefore(svg, c.querySelector(".ItemContent").firstChild);
+								c.classList.add("bookmark-status-28064212");
 							}
 						})
 						.catch(error => console.log(error));;
