@@ -377,7 +377,7 @@ body {
 .categories-group-28064212 a {
 	padding: 10px;
 }
-#categories-28064212 .categories-group-28064212[data-parent="0"] a:hover {
+#categories-28064212 .categories-group-28064212 a:hover {
 	background-color: rgb(59, 85, 134);
 	color: white;
 }
@@ -389,7 +389,7 @@ body {
 .categories-division-28064212:last-child {
 	border-right: none;
 }
-#categories-28064212 .categories-division-28064212:not(:first-child) a {
+#categories-28064212 .categories-division-28064212 a {
 	display: none;
 }
 #categories-loader-28064212 {
