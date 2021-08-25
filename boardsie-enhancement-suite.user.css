@@ -216,7 +216,7 @@ header, .BreadcrumbsBox {
 body {
 	counter-reset: linkcounter;
 }
-.highlight-28064212, .highlight-28064212 td:first-child, .highlight-28064212 .postbit-postbody {
+.highlight-28064212, .highlight-28064212 td:first-child {
 	box-shadow: inset 5px 0px 0px 0px #3b5586 !important;
 }
 .highlight-28064212 .postbit-postbody a:not(.ReactButton)::after {
