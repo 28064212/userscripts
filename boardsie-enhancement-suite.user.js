@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.3.1
+// @version 1.3.2
 // ==/UserScript==
 
 let index = -1;
@@ -18,20 +18,39 @@ if (window.top == window.self) {
 	GM_addStyle(css);
 	window.addEventListener('keydown', keyShortcuts, true);
 
+	let categoriesPromise = null;
+	//check do we need categories?
+	if (true) {
+		categoriesPromise = fetch('/api/v2/categories/?limit=500&maxDepth=100')
+			.then(response => {
+				if (response.ok)
+					return response.json();
+				else
+					throw new Error(response.statusText);
+			})
+			.then(d => {
+				let categories = [];
+				flattenCategories(d, categories);
+				return categories;
+			})
+			.catch(e => console.log(e));
+	}
+
 	let titleBar = document.querySelector('#titleBar');
 	if (titleBar && titleBar.innerHTML == "") {
 		// some pages load titlebar contents lazily
-		let observer = new MutationObserver(addCategoryListing);
+		let observer = new MutationObserver(function (mutationsList, observer) { addCategoryListing(mutationsList, observer, categoriesPromise) });
 		observer.observe(titleBar, { childList: true });
 	}
 	else if (titleBar) {
-		addCategoryListing();
+		addCategoryListing(null, null, categoriesPromise);
 	}
 
 	unboldReadThreads();
 	removeExternalLinkCheck();
 	addThanksAfterPosts();
 	addThreadPreviews();
+	markCategoriesRead(categoriesPromise);
 
 	addBookmarkStatusToComments();
 	let profileComments = document.querySelector('.Profile .Comments.DataList');
@@ -39,6 +58,34 @@ if (window.top == window.self) {
 		let observer = new MutationObserver(addBookmarkStatusToComments);
 		observer.observe(profileComments, { childList: true, subtree: false });
 	}
+}
+function flattenCategories(data, categories) {
+	for (let d of data) {
+		categories.push({ "id": d.categoryID, "parent": d.parentCategoryID, "name": d.name, "slug": d.urlcode, "followed": d.followed, "depth": d.depth, "url": d.url });
+		if (d.children && d.children.length > 0)
+			flattenCategories(d.children, categories)
+	}
+}
+function markCategoriesRead(categoriesPromise) {
+	categoriesPromise.then(categories => {
+		let checks = document.querySelectorAll("h2.CategoryNameHeading a");
+		for (let c of checks) {
+			let slug = (new URL(c.href)).pathname.replace("/categories/", "");
+			fetch('/api/v2/discussions/?categoryID=' + categories.find(o => o.slug == slug).id + '&sort=-dateLastComment&pinOrder=mixed')
+				.then(response => {
+					if (response.ok)
+						return response.json();
+					else
+						throw new Error(response.statusText);
+				})
+				.then(d => {
+					let unread = d.find(o => o.unread);
+					if (!unread)
+						c.style.fontWeight = "normal";
+				})
+				.catch(e => console.log(e));
+		}
+	});
 }
 function unboldReadThreads() {
 	for (let t of document.querySelectorAll('.forum-threadlist-thread')) {
@@ -207,152 +254,120 @@ function addBookmarkStatusToComments() {
 			.catch(error => console.log(error));
 	}
 }
-function addCategoryListing(mutationList, observer) {
-	let catLink = document.querySelector("a[to='/categories']");
-	if (catLink) {
-		if (observer) {
-			// category link is available, don't need to monitor anymore
-			observer.disconnect();
-		}
-		let categories = document.createElement("div");
-		categories.id = "categories-28064212";
-		categories.style.display = "none";
-		categories.tabIndex = -1;
-		document.body.appendChild(categories);
+function addCategoryListing(mutationList, observer, categoriesPromise) {
+	categoriesPromise.then(data => {
+		let catLink = document.querySelector("a[to='/categories']");
+		if (catLink) {
+			// if category link is available, we don't need to monitor anymore
+			if (observer)
+				observer.disconnect();
 
-		let loader = document.createElement("div");
-		loader.id = "categories-loader-28064212";
-		categories.appendChild(loader);
-
-		catLink.parentElement.addEventListener("mouseover", function () {
-			categories.style.display = "block";
-			if (categories.querySelector("#categories-header-28064212") == null) {
-				let categoriesHeader = document.createElement("div");
-				categoriesHeader.id = "categories-header-28064212";
-				categories.appendChild(categoriesHeader);
-				fetch('/api/v2/categories/?limit=500&maxDepth=100')
-					.then(response => {
-						if (response.ok)
-							return response.json();
-						else
-							throw new Error(response.statusText);
-					})
-					.then(data => {
-						data.unshift({ "categoryID": 0, "name": "Followed", "url": "" });
-						for (let d of data) {
-							loader.style.display = "none";
-							let header = document.createElement("a");
-							header.dataset.id = d.categoryID;
-							header.innerText = d.name;
-							header.href = d.url;
-							categoriesHeader.appendChild(header);
-
-							let group = document.createElement("div");
-							group.classList.add("categories-group-28064212");
-							group.style.display = "none";
-							group.dataset.parent = d.categoryID;
-							categories.appendChild(group);
-
-							header.addEventListener("mouseover", function () {
-								// hide all groups, then display the correct one
-								for (let i of document.querySelectorAll(".categories-group-28064212"))
-									i.style.display = "none";
-								group.style.display = "grid";
-
-								// style current header, reset others
-								for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
-									i.style.backgroundColor = "";
-									i.style.color = "";
-								}
-								header.style.backgroundColor = "rgb(59, 85, 134)";
-								header.style.color = "white";
-							});
-
-							if (d.categoryID == 0) {
-								//followed
-								let division = document.createElement("div");
-								division.classList.add("categories-division-28064212");
-								division.dataset.depth = 0;
-								group.appendChild(division);
-								let followed = [];
-								populateFollowed(data, followed);
-								followed.sort(function (a, b) {
-									return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
-								});
-								for (let f of followed) {
-									let childLink = document.createElement('a');
-									childLink.dataset.id = f.categoryID;
-									childLink.innerText = f.name;
-									childLink.href = f.url;
-									division.appendChild(childLink);
-								}
-							}
-							else {
-								for (let i = 0; i < 6; i++) {
-									let division = document.createElement("div");
-									division.classList.add("categories-division-28064212");
-									division.dataset.depth = i;
-									group.appendChild(division);
-								}
-								if (d.children.length > 0)
-									populateCategoryChildren(d, d.categoryID, 0);
-							}
-						}
-					})
-					.catch(error => console.log(error));
-			}
-		});
-		categories.addEventListener("mouseleave", function () {
+			let categories = document.createElement("div");
+			categories.id = "categories-28064212";
 			categories.style.display = "none";
-			for (let i of document.querySelectorAll(".categories-group-28064212"))
-				i.style.display = "none";
-			for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
-				i.style.backgroundColor = "";
-				i.style.color = "";
-			}
-		});
-	}
-}
-function populateFollowed(categories, followed) {
-	for (let c of categories) {
-		if (c.followed)
-			followed.push({ "categoryID": c.categoryID, "name": c.name, "url": c.url });
-		if (c.children && c.children.length > 0)
-			populateFollowed(c.children, followed)
-	}
-}
-function populateCategoryChildren(target, root, depth) {
-	for (let c of target.children) {
-		let childLink = document.createElement('a');
-		childLink.dataset.id = c.categoryID;
-		childLink.dataset.parent = c.parentCategoryID;
-		childLink.innerText = c.name;
-		childLink.href = c.url;
-		document.querySelector('.categories-group-28064212[data-parent="' + root + '"]').querySelectorAll('.categories-division-28064212')[depth].appendChild(childLink);
-		childLink.addEventListener("mouseover", function () {
-			for (let i = depth + 1; i < 6; i++) {
-				// hide items from divisions greater than depth
-				for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + i + '"] a'))
-					j.style.display = "none";
-				// remove style from links in divisions greater than or equal to depth
-				for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + (i - 1) + '"] a')) {
-					j.style.backgroundColor = "";
-					j.style.color = "";
+			categories.tabIndex = -1;
+			document.body.appendChild(categories);
+
+			catLink.parentElement.addEventListener("mouseover", function () {
+				categories.style.display = "block";
+			});
+			categories.addEventListener("mouseleave", function () {
+				categories.style.display = "none";
+				for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
+					i.style.backgroundColor = "";
+					i.style.color = "";
 				}
+				for (let i of document.querySelectorAll('.categories-division-28064212 a')) {
+					i.style.display = 'none';
+				}
+			});
+			let categoriesHeader = document.createElement("div");
+			categoriesHeader.id = "categories-header-28064212";
+			categories.appendChild(categoriesHeader);
+
+			let group = document.createElement("div");
+			group.classList.add("categories-group-28064212");
+			group.style.display = "grid";
+			categories.appendChild(group);
+
+			for (let i = 2; i < 8; i++) {
+				let division = document.createElement("div");
+				division.classList.add("categories-division-28064212");
+				division.dataset.depth = i;
+				group.appendChild(division);
 			}
-			childLink.style.backgroundColor = "rgb(59, 85, 134)";
-			childLink.style.color = "white";
-			for (let i of document.querySelectorAll('.categories-division-28064212 a[data-parent="' + c.categoryID + '"]'))
-				i.style.display = "block";
-		});
-		if (c.children.length > 0) {
-			let arrow = document.createElement("div");
-			arrow.innerText = "⇒";
-			arrow.style.float = "right";
-			childLink.appendChild(arrow);
-			populateCategoryChildren(c, root, depth + 1)
+
+			data.unshift({ "id": 0, "parent": null, "followed": false, "name": "Followed", "url": "/categories?followed=1", "slug": "followed", "depth": 1 });
+			for (let d of data.filter(o => o.depth == 1)) {
+				let header = document.createElement("a");
+				header.dataset.id = d.id;
+				header.innerText = d.name;
+				header.href = d.url;
+				categoriesHeader.appendChild(header);
+
+				header.addEventListener("mouseover", function () {
+					//clear all divisions, populate children
+					for (let i of document.querySelectorAll('.categories-division-28064212 a')) {
+						if (i.dataset.parent == d.id)
+							i.style.display = 'block';
+						else
+							i.style.display = 'none';
+					}
+					// style current header, reset others
+					for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
+						i.style.backgroundColor = "";
+						i.style.color = "";
+					}
+					header.style.backgroundColor = "rgb(59, 85, 134)";
+					header.style.color = "white";
+				});
+			}
+			let links = data.filter(f => f.depth > 1);
+			for (let l of links) {
+				let childLink = document.createElement('a');
+				childLink.dataset.id = l.id;
+				childLink.dataset.parent = l.parent;
+				childLink.innerText = l.name;
+				childLink.href = l.url;
+				if (data.filter(c => c.parent == l.id).length > 0) {
+					let arrow = document.createElement("div");
+					arrow.innerText = "⇒";
+					arrow.style.float = "right";
+					childLink.appendChild(arrow);
+				}
+				document.querySelectorAll('.categories-division-28064212')[l.depth - 2].appendChild(childLink);
+
+				childLink.addEventListener("mouseover", function () {
+					for (let i = l.depth + 1; i < 8; i++) {
+						// hide items from divisions greater than depth
+						for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + i + '"] a'))
+							j.style.display = "none";
+						// remove style from links in divisions greater than or equal to depth
+						for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + (i - 1) + '"] a')) {
+							j.style.backgroundColor = "";
+							j.style.color = "";
+						}
+					}
+					childLink.style.backgroundColor = "rgb(59, 85, 134)";
+					childLink.style.color = "white";
+					for (let i of document.querySelectorAll('.categories-division-28064212 a[data-parent="' + l.id + '"]'))
+						i.style.display = "block";
+				});
+			}
+			links = data.filter(f => f.followed);
+			links.sort(function (a, b) {
+				return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+			});
+			for (let l of links) {
+				let childLink = document.createElement('a');
+				childLink.dataset.id = l.id;
+				childLink.dataset.parent = 0;
+				childLink.innerText = l.name;
+				childLink.href = l.url;
+				document.querySelectorAll('.categories-division-28064212')[0].appendChild(childLink);
+			}
 		}
-	}
+	});
 }
 function createAlert(msg) {
 	for (let a of document.querySelectorAll(".alert-28064212")) {
