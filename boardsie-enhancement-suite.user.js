@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.3.2
+// @version 1.3.3
 // ==/UserScript==
 
 let index = -1;
@@ -50,6 +50,7 @@ if (window.top == window.self) {
 	removeExternalLinkCheck();
 	addThanksAfterPosts();
 	addThreadPreviews();
+	highlightOP();
 	markCategoriesRead(categoriesPromise);
 
 	addBookmarkStatusToComments();
@@ -151,6 +152,18 @@ function addThreadPreviews() {
 							l.addEventListener('mouseout', function (e) {
 								preview.style.display = "none";
 							});
+							if (d.bookmarked) {
+								let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+								svg.setAttribute("viewBox", "0 0 12.733 16.394");
+								svg.innerHTML = '<title>Bookmark</title><path class="svgBookmark-mainPath" stroke-width="2" d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"></path>';
+								svg.style.height = "16px";
+								svg.style.width = "12px";
+								svg.style.float = "right";
+								svg.style.marginLeft = "10px";
+								svg.querySelector('path').style.stroke = "rgb(59, 85, 134)";
+								svg.querySelector('path').style.fill = "rgb(59, 85, 134)";
+								parent.insertBefore(svg, parent.querySelector('.Category, .oplink-wrapper'));
+							}
 						}
 					}
 				}
@@ -202,6 +215,14 @@ function appendThanks(element, type, id) {
 			thankers.innerHTML = thankers.innerHTML.slice(0, -2);
 		})
 		.catch(error => console.log(error));
+}
+function highlightOP() {
+	if (gdn.meta.DiscussionID) {
+		let userid = gdn.meta.eventData.discussion.discussionUser.userID;
+		let posts = document.querySelectorAll("span[data-dropdown='user" + userid + "-menu']");
+		for(let p of posts)
+			p.parentElement.classList.add('original-poster-28064212');
+	}
 }
 function addBookmarkStatusToComments() {
 	let commentElements = document.querySelectorAll('.Profile .Comments .Item:not(.bookmark-status-28064212)');
@@ -558,10 +579,16 @@ function keyShortcuts(key) {
 		}
 		else if (!ctrl && code == 77) {
 			// m - Mark forum read
-			let transientKey = gdn.meta.TransientKey;
-			let category = document.querySelector('meta[name=catid]').content;
-			fetch("/category/markread?categoryid=" + category + "&tkey=" + transientKey)
-				.then(createAlert("Forum marked read, refresh to update"));
+			if (document.querySelector('meta[name=catid]')) {
+				let category = document.querySelector('meta[name=catid]').content;
+				let transientKey = gdn.meta.TransientKey;
+				fetch("/category/markread?categoryid=" + category + "&tkey=" + transientKey)
+					.then(createAlert("Marked read"))
+					.then(d => {
+						for (let u of document.querySelectorAll(".unread"))
+							u.classList.remove("unread")
+					});
+			}
 		}
 		else if (!ctrl && code == 84 && hl && hl.querySelector('.ReactButton-Like')) {
 			// t - toggle thanks of highlighted post
