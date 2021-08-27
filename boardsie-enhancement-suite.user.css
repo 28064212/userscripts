@@ -419,6 +419,18 @@ body {
 	}
 }
 
+/* op highlight */
+
+.original-poster-28064212 {
+	padding-left: 5px;
+	padding-right: 5px;
+	border-radius: 5px;
+}
+.original-poster-28064212, .original-poster-28064212 span {
+	background-color: rgb(59, 85, 134) !important;
+	color: white !important;
+}
+
 /* alerts */
 
 .alert-28064212 {
