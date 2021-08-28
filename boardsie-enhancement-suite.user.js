@@ -5,18 +5,32 @@
 // @downloadURL https://github.com/28064212/userscripts/raw/master/boardsie-enhancement-suite.user.js
 // @resource css https://github.com/28064212/userscripts/raw/master/boardsie-enhancement-suite.user.css
 // @grant GM_getResourceText
-// @grant GM_addStyle
+// @grant GM.addStyle
+// @grant GM.getValue
+// @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.3.4
+// @version 1.4
 // ==/UserScript==
 
 let index = -1;
 let showpreviews = false;
+let settings = {};
 if (window.top == window.self) {
-	let css = GM_getResourceText("css");
-	GM_addStyle(css);
-	window.addEventListener('keydown', keyShortcuts, true);
+	GM.addStyle(GM_getResourceText("css"));
+
+	(async () => {
+		settings = await GM.getValue('settings', {});
+		// default autobookmark to true
+		if (settings.autobookmark === undefined)
+			settings.autobookmark = true;
+		if (settings.keyboard === undefined)
+			settings.keyboard = true;
+
+		if (settings.keyboard)
+			window.addEventListener('keydown', keyShortcuts, true);
+		await GM.setValue("settings", settings);
+	})();
 
 	let categoriesPromise = null;
 	//check do we need categories?
@@ -39,11 +53,12 @@ if (window.top == window.self) {
 	let titleBar = document.querySelector('#titleBar');
 	if (titleBar && titleBar.innerHTML == "") {
 		// some pages load titlebar contents lazily
-		let observer = new MutationObserver(function (mutationsList, observer) { addCategoryListing(mutationsList, observer, categoriesPromise) });
+		let observer = new MutationObserver(function (mutationsList, observer) { titleBarObserver(mutationsList, observer, categoriesPromise) });
 		observer.observe(titleBar, { childList: true });
 	}
 	else if (titleBar) {
-		addCategoryListing(null, null, categoriesPromise);
+		addCategoryListing(categoriesPromise);
+		menuItems();
 	}
 
 	unboldReadThreads();
@@ -52,6 +67,7 @@ if (window.top == window.self) {
 	addThreadPreviews();
 	highlightOP();
 	postNumbers();
+	autoBookmark();
 	markCategoriesRead(categoriesPromise);
 
 	addBookmarkStatusToComments();
@@ -61,11 +77,232 @@ if (window.top == window.self) {
 		observer.observe(profileComments, { childList: true, subtree: false });
 	}
 }
+function titleBarObserver(mutationList, observer, categoriesPromise) {
+	let catLink = document.querySelector("a[to='/categories']");
+	if (catLink) {
+		// if category link is available, we don't need to monitor anymore
+		if (observer)
+			observer.disconnect();
+		addCategoryListing(categoriesPromise);
+		menuItems();
+	}
+}
+function menuItems() {
+	let meBox = document.querySelector('.meBox');
+	let a = document.createElement('a');
+	a.innerHTML = '⚙';
+	a.id = 'settings-icon-28064212';
+	meBox.insertBefore(a, meBox.lastElementChild);
+	a.addEventListener('click', settingsModal);
+
+	a = document.createElement('a');
+	a.innerHTML = '⌨';
+	a.id = 'docs-icon-28064212';
+	meBox.insertBefore(a, meBox.lastElementChild);
+	a.addEventListener('click', docsModal);
+}
+async function settingsModal() {
+	let settingsModal = document.querySelector('#settings-28064212');
+	if (settingsModal) {
+		settingsModal.style.display = settingsModal.style.display == 'none' ? 'block' : 'none';
+	}
+	else {
+		settingsModal = document.createElement('div');
+		settingsModal.id = 'settings-28064212';
+		settingsModal.addEventListener('click', function (e) {
+			if (e.target == settingsModal)
+				e.target.style.display = 'none';
+		});
+		document.body.appendChild(settingsModal);
+		let content = document.createElement('div');
+		content.id = 'settings-content-28064212';
+		settingsModal.appendChild(content);
+		let header = document.createElement("p");
+		header.innerHTML = "Boardsie Enhancement Suite - Settings";
+		content.appendChild(header);
+		let lhm = document.createElement("div");
+		lhm.innerHTML = "<p>Behaviour</p>";
+		content.appendChild(lhm);
+
+		let behaviours = document.createElement('div');
+		behaviours.classList.add("settings-values-28064212");
+		behaviours.id = "settings-behaviours-28064212";
+		content.appendChild(behaviours);
+		behaviours.innerHTML += '<p><input type="checkbox" id="settings-autobookmark-28064212" /><label for="settings-autobookmark-28064212">Automatically bookmark discussions when you create or comment on them</label></p>';
+		behaviours.innerHTML += '<p><input type="checkbox" id="settings-keyboard-28064212" /><label for="settings-keyboard-28064212">Enable keyboard shortcuts (requires refresh)</label></p>';
+
+		let autobookmark = behaviours.querySelector('#settings-autobookmark-28064212');
+		autobookmark.checked = settings.autobookmark;
+		autobookmark.addEventListener('change', async function (e) {
+			settings.autobookmark = autobookmark.checked;
+			await GM.setValue("settings", settings);
+		});
+
+		let keyboard = behaviours.querySelector('#settings-keyboard-28064212');
+		keyboard.checked = settings.keyboard;
+		keyboard.addEventListener('change', async function (e) {
+			settings.keyboard = keyboard.checked;
+			await GM.setValue("settings", settings);
+		});
+	}
+}
+function docsModal() {
+	let docsModal = document.querySelector('#docs-28064212');
+	if (docsModal == null) {
+		docsModal = document.createElement('div');
+		docsModal.id = 'docs-28064212';
+		docsModal.style.display = 'none';
+		docsModal.addEventListener('click', function (e) {
+			if (e.target == docsModal)
+				e.target.style.display = 'none';
+		});
+		document.body.appendChild(docsModal);
+		docsModal.innerHTML = `
+	<div id="docs-content-28064212">
+		<p>Boardsie Enhancement Suite</p>
+		<div class="docs-keygroup">
+			<p>General</p>
+			<table>
+				<tbody>
+					<tr>
+						<td><kbd>?</kbd></td>
+						<td>Toggle documentation</td>
+					</tr>
+					<tr>
+						<td><kbd>s</kbd></td>
+						<td>Toggle settings menu</td>
+					</tr>
+					<tr>
+						<td><kbd>a / z</kbd></td>
+						<td>Highlight next/previous</td>
+					</tr>
+					<tr>
+						<td><kbd>→</kbd></td>
+						<td>Next page</td>
+					</tr>
+					<tr>
+						<td><kbd>shift</kbd><kbd>→</kbd></td>
+						<td>Last page</td>
+					</tr>
+					<tr>
+						<td><kbd>←</kbd></td>
+						<td>Previous page</td>
+					</tr>
+					<tr>
+						<td><kbd>shift</kbd><kbd>←</kbd></td>
+						<td>First page</td>
+					</tr>
+					<tr>
+						<td><kbd>ctrl</kbd><kbd>←</kbd></td>
+						<td>Go to parent</td>
+					</tr>
+					<tr>
+						<td><kbd>c</kbd></td>
+						<td>Display category menu</td>
+					</tr>
+					<tr>
+						<td><kbd>ctrl</kbd><kbd>space</kbd></td>
+						<td>Focus on search box</td>
+					</tr>
+					<tr>
+						<td><kbd>esc</kbd></td>
+						<td>Close settings/documentation</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="docs-keygroup">
+			<p>Thread Lists</p>
+			<table>
+				<tbody>
+					<tr>
+						<td><kbd>q</kbd></td>
+						<td>Open highlighted thread</td>
+					</tr>
+					<tr>
+						<td><kbd>ctrl</kbd><kbd>q</kbd></td>
+						<td>Open at last page</td>
+					</tr>
+					<tr>
+						<td><kbd>alt</kbd><kbd>q</kbd></td>
+						<td>Open at first page</td>
+					</tr>
+					<tr>
+						<td><kbd>r</kbd></td>
+						<td>Start a new thread</td>
+					</tr>
+					<tr>
+						<td><kbd>o</kbd></td>
+						<td>Open all unread threads</td>
+					</tr>
+					<tr>
+						<td><kbd>f</kbd></td>
+						<td>Follow forum</td>
+					</tr>
+					<tr>
+						<td><kbd>m</kbd></td>
+						<td>Mark forum read</td>
+					</tr>
+					<tr>
+						<td><kbd>x</kbd></td>
+						<td>Show thread preview</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="docs-keygroup">
+			<p>Post Lists</p>
+			<table>
+				<tbody>
+					<tr>
+						<td><kbd>r</kbd></td>
+						<td>Add a new reply</td>
+					</tr>
+					<tr>
+						<td><kbd>q</kbd></td>
+						<td>Quote highlighted post</td>
+					</tr>
+					<tr>
+						<td><kbd>l</kbd></td>
+						<td>Go to latest unread on current page</td>
+					</tr>
+					<tr>
+						<td><kbd>t</kbd></td>
+						<td>Toggle thanks on highlighted post</td>
+					</tr>
+					<tr>
+						<td><kbd>f</kbd></td>
+						<td>Follow thread</td>
+					</tr>
+					<tr>
+						<td><kbd>1-9</kbd></td>
+						<td>Open the corresponding link</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>`;
+	}
+	docsModal.style.display = docsModal.style.display == 'none' ? 'block' : 'none';
+}
 function flattenCategories(data, categories) {
 	for (let d of data) {
 		categories.push({ "id": d.categoryID, "parent": d.parentCategoryID, "name": d.name, "slug": d.urlcode, "followed": d.followed, "depth": d.depth, "url": d.url });
 		if (d.children && d.children.length > 0)
 			flattenCategories(d.children, categories)
+	}
+}
+function autoBookmark() {
+	let postButton = document.querySelector('#Form_PostComment');
+	if (postButton) {
+		postButton.addEventListener('click', function () {
+			if (settings.autobookmark) {
+				if (document.querySelector('a.Bookmark') && document.querySelector('a.Bookmarked') == null) {
+					document.querySelector('a.Bookmark').click();
+					createAlert("Discussion bookmarked");
+				}
+			}
+		});
 	}
 }
 function postNumbers() {
@@ -296,118 +533,112 @@ function addBookmarkStatusToComments() {
 			.catch(error => console.log(error));
 	}
 }
-function addCategoryListing(mutationList, observer, categoriesPromise) {
+function addCategoryListing(categoriesPromise) {
 	categoriesPromise.then(data => {
 		let catLink = document.querySelector("a[to='/categories']");
-		if (catLink) {
-			// if category link is available, we don't need to monitor anymore
-			if (observer)
-				observer.disconnect();
+		let categories = document.createElement("div");
+		categories.id = "categories-28064212";
+		categories.style.display = "none";
+		categories.tabIndex = -1;
+		document.body.appendChild(categories);
 
-			let categories = document.createElement("div");
-			categories.id = "categories-28064212";
+		catLink.parentElement.addEventListener("mouseover", function () {
+			categories.style.display = "block";
+		});
+		categories.addEventListener("mouseleave", function () {
 			categories.style.display = "none";
-			categories.tabIndex = -1;
-			document.body.appendChild(categories);
+			for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
+				i.style.backgroundColor = "";
+				i.style.color = "";
+			}
+			for (let i of document.querySelectorAll('.categories-division-28064212 a')) {
+				i.style.display = 'none';
+			}
+		});
+		let categoriesHeader = document.createElement("div");
+		categoriesHeader.id = "categories-header-28064212";
+		categories.appendChild(categoriesHeader);
 
-			catLink.parentElement.addEventListener("mouseover", function () {
-				categories.style.display = "block";
-			});
-			categories.addEventListener("mouseleave", function () {
-				categories.style.display = "none";
+		let group = document.createElement("div");
+		group.classList.add("categories-group-28064212");
+		group.style.display = "grid";
+		categories.appendChild(group);
+
+		for (let i = 2; i < 8; i++) {
+			let division = document.createElement("div");
+			division.classList.add("categories-division-28064212");
+			division.dataset.depth = i;
+			group.appendChild(division);
+		}
+
+		data.unshift({ "id": 0, "parent": null, "followed": false, "name": "Followed", "url": "/categories?followed=1", "slug": "followed", "depth": 1 });
+		for (let d of data.filter(o => o.depth == 1)) {
+			let header = document.createElement("a");
+			header.dataset.id = d.id;
+			header.innerText = d.name;
+			header.href = d.url;
+			categoriesHeader.appendChild(header);
+
+			header.addEventListener("mouseover", function () {
+				//clear all divisions, populate children
+				for (let i of document.querySelectorAll('.categories-division-28064212 a')) {
+					if (i.dataset.parent == d.id)
+						i.style.display = 'block';
+					else
+						i.style.display = 'none';
+				}
+				// style current header, reset others
 				for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
 					i.style.backgroundColor = "";
 					i.style.color = "";
 				}
-				for (let i of document.querySelectorAll('.categories-division-28064212 a')) {
-					i.style.display = 'none';
-				}
+				header.style.backgroundColor = "rgb(59, 85, 134)";
+				header.style.color = "white";
 			});
-			let categoriesHeader = document.createElement("div");
-			categoriesHeader.id = "categories-header-28064212";
-			categories.appendChild(categoriesHeader);
-
-			let group = document.createElement("div");
-			group.classList.add("categories-group-28064212");
-			group.style.display = "grid";
-			categories.appendChild(group);
-
-			for (let i = 2; i < 8; i++) {
-				let division = document.createElement("div");
-				division.classList.add("categories-division-28064212");
-				division.dataset.depth = i;
-				group.appendChild(division);
+		}
+		let links = data.filter(f => f.depth > 1);
+		for (let l of links) {
+			let childLink = document.createElement('a');
+			childLink.dataset.id = l.id;
+			childLink.dataset.parent = l.parent;
+			childLink.innerText = l.name;
+			childLink.href = l.url;
+			if (data.filter(c => c.parent == l.id).length > 0) {
+				let arrow = document.createElement("div");
+				arrow.innerText = "⇒";
+				arrow.style.float = "right";
+				childLink.appendChild(arrow);
 			}
+			document.querySelectorAll('.categories-division-28064212')[l.depth - 2].appendChild(childLink);
 
-			data.unshift({ "id": 0, "parent": null, "followed": false, "name": "Followed", "url": "/categories?followed=1", "slug": "followed", "depth": 1 });
-			for (let d of data.filter(o => o.depth == 1)) {
-				let header = document.createElement("a");
-				header.dataset.id = d.id;
-				header.innerText = d.name;
-				header.href = d.url;
-				categoriesHeader.appendChild(header);
-
-				header.addEventListener("mouseover", function () {
-					//clear all divisions, populate children
-					for (let i of document.querySelectorAll('.categories-division-28064212 a')) {
-						if (i.dataset.parent == d.id)
-							i.style.display = 'block';
-						else
-							i.style.display = 'none';
+			childLink.addEventListener("mouseover", function () {
+				for (let i = l.depth + 1; i < 8; i++) {
+					// hide items from divisions greater than depth
+					for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + i + '"] a'))
+						j.style.display = "none";
+					// remove style from links in divisions greater than or equal to depth
+					for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + (i - 1) + '"] a')) {
+						j.style.backgroundColor = "";
+						j.style.color = "";
 					}
-					// style current header, reset others
-					for (let i of document.querySelectorAll("#categories-header-28064212 a")) {
-						i.style.backgroundColor = "";
-						i.style.color = "";
-					}
-					header.style.backgroundColor = "rgb(59, 85, 134)";
-					header.style.color = "white";
-				});
-			}
-			let links = data.filter(f => f.depth > 1);
-			for (let l of links) {
-				let childLink = document.createElement('a');
-				childLink.dataset.id = l.id;
-				childLink.dataset.parent = l.parent;
-				childLink.innerText = l.name;
-				childLink.href = l.url;
-				if (data.filter(c => c.parent == l.id).length > 0) {
-					let arrow = document.createElement("div");
-					arrow.innerText = "⇒";
-					arrow.style.float = "right";
-					childLink.appendChild(arrow);
 				}
-				document.querySelectorAll('.categories-division-28064212')[l.depth - 2].appendChild(childLink);
-
-				childLink.addEventListener("mouseover", function () {
-					for (let i = l.depth + 1; i < 8; i++) {
-						// hide items from divisions greater than depth
-						for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + i + '"] a'))
-							j.style.display = "none";
-						// remove style from links in divisions greater than or equal to depth
-						for (let j of document.querySelectorAll('.categories-division-28064212[data-depth="' + (i - 1) + '"] a')) {
-							j.style.backgroundColor = "";
-							j.style.color = "";
-						}
-					}
-					childLink.style.backgroundColor = "rgb(59, 85, 134)";
-					childLink.style.color = "white";
-					for (let i of document.querySelectorAll('.categories-division-28064212 a[data-parent="' + l.id + '"]'))
-						i.style.display = "block";
-				});
-			}
-			links = data.filter(f => f.followed);
-			links.sort(function (a, b) {
-				return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+				childLink.style.backgroundColor = "rgb(59, 85, 134)";
+				childLink.style.color = "white";
+				for (let i of document.querySelectorAll('.categories-division-28064212 a[data-parent="' + l.id + '"]'))
+					i.style.display = "block";
 			});
-			for (let l of links) {
-				let childLink = document.createElement('a');
-				childLink.dataset.id = l.id;
-				childLink.dataset.parent = 0;
-				childLink.innerText = l.name;
-				childLink.href = l.url;
-				document.querySelectorAll('.categories-division-28064212')[0].appendChild(childLink);
-			}
+		}
+		links = data.filter(f => f.followed);
+		links.sort(function (a, b) {
+			return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+		});
+		for (let l of links) {
+			let childLink = document.createElement('a');
+			childLink.dataset.id = l.id;
+			childLink.dataset.parent = 0;
+			childLink.innerText = l.name;
+			childLink.href = l.url;
+			document.querySelectorAll('.categories-division-28064212')[0].appendChild(childLink);
 		}
 	});
 }
@@ -534,7 +765,7 @@ function keyShortcuts(key) {
 				if (document.querySelector('a.Bookmarked'))
 					createAlert("Thread unfollowed");
 				else
-					createAlert("Thread followed");
+					createAlert("Discussion bookmarked");
 				document.querySelector('a.Bookmark').click();
 			}
 			else if (document.querySelector("button[aria-label='Follow'], button[aria-label='Unfollow']")) {
@@ -625,6 +856,10 @@ function keyShortcuts(key) {
 			else if (document.querySelector(".BoxNewDiscussion a"))
 				document.querySelector(".BoxNewDiscussion a").click();
 		}
+		else if (!ctrl && code == 83) {
+			// s - show/hide settings
+			settingsModal();
+		}
 		else if (!ctrl && code == 84 && hl && hl.querySelector('.ReactButton-Like')) {
 			// t - toggle thanks of highlighted post
 			hl.querySelector('.ReactButton-Like').click();
@@ -641,136 +876,16 @@ function keyShortcuts(key) {
 			if (hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)').length > 0 && hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code])
 				window.open(hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code]);
 		}
+		else if (!ctrl && code == 27) {
+			// esc - close settings/documentation
+			if (document.querySelector('#settings-28064212'))
+				document.querySelector('#settings-28064212').style.display = "none";
+			if (document.querySelector('#docs-28064212'))
+				document.querySelector('#docs-28064212').style.display = "none";
+		}
 		else if (shift && code == 191) {
 			// ? - show/hide documentation
-			let d = document.querySelector('#docs-28064212');
-			if (d == null) {
-				d = document.createElement('div');
-				d.id = 'docs-28064212';
-				d.style.display = 'none';
-				document.body.appendChild(d);
-				d.innerHTML = `
-				<div id="docs-28064212">
-				<div id="docs-content-28064212">
-					<p>Boardsie Enhancement Suite</p>
-					<div class="docs-keygroup">
-						<p>General</p>
-						<table>
-							<tbody>
-								<tr>
-									<td><kbd>?</kbd></td>
-									<td>Toggle documentation</td>
-								</tr>
-								<tr>
-									<td><kbd>a / z</kbd></td>
-									<td>Highlight next/previous</td>
-								</tr>
-								<tr>
-									<td><kbd>→</kbd></td>
-									<td>Next page</td>
-								</tr>
-								<tr>
-									<td><kbd>shift</kbd><kbd>→</kbd></td>
-									<td>Last page</td>
-								</tr>
-								<tr>
-									<td><kbd>←</kbd></td>
-									<td>Previous page</td>
-								</tr>
-								<tr>
-									<td><kbd>shift</kbd><kbd>←</kbd></td>
-									<td>First page</td>
-								</tr>
-								<tr>
-									<td><kbd>ctrl</kbd><kbd>←</kbd></td>
-									<td>Go to parent</td>
-								</tr>
-								<tr>
-									<td><kbd>c</kbd></td>
-									<td>Display category menu</td>
-								</tr>
-								<tr>
-									<td><kbd>ctrl</kbd><kbd>space</kbd></td>
-									<td>Focus on search box</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<div class="docs-keygroup">
-						<p>Thread Lists</p>
-						<table>
-							<tbody>
-								<tr>
-									<td><kbd>q</kbd></td>
-									<td>Open highlighted thread</td>
-								</tr>
-								<tr>
-									<td><kbd>ctrl</kbd><kbd>q</kbd></td>
-									<td>Open at last page</td>
-								</tr>
-								<tr>
-									<td><kbd>alt</kbd><kbd>q</kbd></td>
-									<td>Open at first page</td>
-								</tr>
-								<tr>
-									<td><kbd>r</kbd></td>
-									<td>Start a new thread</td>
-								</tr>
-								<tr>
-									<td><kbd>o</kbd></td>
-									<td>Open all unread threads</td>
-								</tr>
-								<tr>
-									<td><kbd>f</kbd></td>
-									<td>Follow forum</td>
-								</tr>
-								<tr>
-									<td><kbd>m</kbd></td>
-									<td>Mark forum read</td>
-								</tr>
-								<tr>
-									<td><kbd>x</kbd></td>
-									<td>Show thread preview</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<div class="docs-keygroup">
-						<p>Post Lists</p>
-						<table>
-							<tbody>
-								<tr>
-									<td><kbd>r</kbd></td>
-									<td>Add a new reply</td>
-								</tr>
-								<tr>
-									<td><kbd>q</kbd></td>
-									<td>Quote highlighted post</td>
-								</tr>
-								<tr>
-									<td><kbd>l</kbd></td>
-									<td>Go to latest unread on current page</td>
-								</tr>
-								<tr>
-									<td><kbd>t</kbd></td>
-									<td>Toggle thanks on highlighted post</td>
-								</tr>
-								<tr>
-									<td><kbd>f</kbd></td>
-									<td>Follow thread</td>
-								</tr>
-								<tr>
-									<td><kbd>1-9</kbd></td>
-									<td>Open the corresponding link</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-				`;
-			}
-			d.style.display = d.style.display == 'none' ? 'block' : 'none';
+			docsModal();
 		}
 	}
 }
