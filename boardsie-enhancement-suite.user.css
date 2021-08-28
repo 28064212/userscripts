@@ -436,7 +436,8 @@ body {
 .postcount-28064212 {
 	float: right;
 	font-size: 11px;
-	color: white
+	color: white;
+	padding-left: 5px;
 }
 .postcount-28064212:hover {
 	color: white
