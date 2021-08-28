@@ -431,6 +431,14 @@ body {
 	color: white !important;
 }
 
+/* post counts */
+
+.postcount-28064212 {
+	float: right;
+	font-size: 11px;
+	color: white
+}
+
 /* alerts */
 
 .alert-28064212 {
