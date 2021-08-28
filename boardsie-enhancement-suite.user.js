@@ -8,7 +8,7 @@
 // @grant GM_addStyle
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.3.3
+// @version 1.3.4
 // ==/UserScript==
 
 let index = -1;
@@ -51,6 +51,7 @@ if (window.top == window.self) {
 	addThanksAfterPosts();
 	addThreadPreviews();
 	highlightOP();
+	postNumbers();
 	markCategoriesRead(categoriesPromise);
 
 	addBookmarkStatusToComments();
@@ -65,6 +66,26 @@ function flattenCategories(data, categories) {
 		categories.push({ "id": d.categoryID, "parent": d.parentCategoryID, "name": d.name, "slug": d.urlcode, "followed": d.followed, "depth": d.depth, "url": d.url });
 		if (d.children && d.children.length > 0)
 			flattenCategories(d.children, categories)
+	}
+}
+function postNumbers() {
+	let posts = document.querySelectorAll('.Comments .postbit-header');
+	if (posts.length > 0) {
+		let page = (document.querySelector(".Pager .Highlight") ? document.querySelector(".Pager .Highlight").textContent : 1) - 1;
+		let start = 0;
+		if (page != 0)
+			start = (page * 30) + 1;
+		for (let i = 0; i < posts.length; i++) {
+			let count = document.createElement('a');
+			count.classList.add('postcount-28064212')
+			count.textContent = '#' + (start + i + 1);
+			posts[i].insertBefore(count, posts[i].firstElementChild.nextElementSibling);
+			let commentid = posts[i].parentElement.parentElement.parentElement.id.replace('Comment_', '');
+			if (commentid == '')
+				count.href = gdn.meta.eventData.discussion.url + '/p1';
+			else
+				count.href = '/discussion/comment/' + commentid + '#Comment_' + commentid;
+		}
 	}
 }
 function markCategoriesRead(categoriesPromise) {
@@ -220,7 +241,7 @@ function highlightOP() {
 	if (gdn.meta.DiscussionID) {
 		let userid = gdn.meta.eventData.discussion.discussionUser.userID;
 		let posts = document.querySelectorAll("span[data-dropdown='user" + userid + "-menu']");
-		for(let p of posts)
+		for (let p of posts)
 			p.parentElement.classList.add('original-poster-28064212');
 	}
 }
@@ -501,37 +522,11 @@ function keyShortcuts(key) {
 					hl.scrollIntoView(code == 90);
 			}
 		}
-		else if (code == 81 && hl) {
-			// q - open thread/forum or quote highlighted post
-			if (ctrl && hl.querySelector('.MiniPager') && hl.querySelector('.MiniPager').querySelector('a:first-of-type')) {
-				// first page
-				window.open(hl.querySelector('.MiniPager').querySelector('a:first-of-type'));
-			}
-			else if (alt && hl.querySelector('.MiniPager') && hl.querySelector('.MiniPager').querySelector('a:last-of-type')) {
-				// last page
-				window.open(hl.querySelector('.MiniPager').querySelector('a:last-of-type'));
-			}
-			else if (hl.querySelector('.oplink-wrapper a, a.threadbit-threadlink')) {
-				// last unread post
-				window.open(hl.querySelector('.oplink-wrapper a, a.threadbit-threadlink'));
-			}
-			else if (hl.querySelector('a.Quote')) {
-				// quote highlighted post
-				hl.querySelector('a.Quote').click();
-				key.preventDefault();
-			}
-		}
-		else if (!ctrl && code == 76 && document.querySelector('#latest')) {
-			// l - scroll to latest
-			document.querySelector('#latest').scrollIntoView();
-		}
-		else if (!ctrl && code == 79) {
-			// o - open all unread threads
-			let threads = document.querySelectorAll('.forum-threadlist-thread');
-			for (let t of threads) {
-				if (t.querySelector('.HasNew'))
-					window.open(t.querySelector('a'));
-			}
+		else if (!ctrl && code == 67) {
+			// c - display category menu
+			window.scrollTo(0, 0);
+			document.querySelector("a[to='/categories']").parentElement.dispatchEvent(new Event('mouseover'));
+			document.querySelector("#categories-28064212").focus();
 		}
 		else if (!ctrl && code == 70) {
 			// f - follow/unfollow
@@ -571,11 +566,9 @@ function keyShortcuts(key) {
 					.catch(e => console.log(e));
 			}
 		}
-		else if (!ctrl && hl && code >= 48 && code <= 57) {
-			// 0-9: open links
-			code = code == 48 ? 10 : code - 49;
-			if (hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)').length > 0 && hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code])
-				window.open(hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code]);
+		else if (!ctrl && code == 76 && document.querySelector('#latest')) {
+			// l - scroll to latest
+			document.querySelector('#latest').scrollIntoView();
 		}
 		else if (!ctrl && code == 77) {
 			// m - Mark forum read
@@ -590,9 +583,37 @@ function keyShortcuts(key) {
 					});
 			}
 		}
-		else if (!ctrl && code == 84 && hl && hl.querySelector('.ReactButton-Like')) {
-			// t - toggle thanks of highlighted post
-			hl.querySelector('.ReactButton-Like').click();
+		else if (!ctrl && code == 79) {
+			// o - open all unread threads
+			let threads = document.querySelectorAll('.forum-threadlist-thread');
+			for (let t of threads) {
+				if (t.querySelector('.HasNew'))
+					window.open(t.querySelector('a'));
+			}
+		}
+		else if (!ctrl && code == 80 && hl && hl.getElementsByClassName('customspamlink').length > 0) {
+			// p - Report spammer (if https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Quick%20Spam%20Reporting.user.js also installed)
+			window.open(hl.getElementsByClassName('customspamlink')[0]);
+		}
+		else if (code == 81 && hl) {
+			// q - open thread/forum or quote highlighted post
+			if (ctrl && hl.querySelector('.MiniPager') && hl.querySelector('.MiniPager').querySelector('a:first-of-type')) {
+				// first page
+				window.open(hl.querySelector('.MiniPager').querySelector('a:first-of-type'));
+			}
+			else if (alt && hl.querySelector('.MiniPager') && hl.querySelector('.MiniPager').querySelector('a:last-of-type')) {
+				// last page
+				window.open(hl.querySelector('.MiniPager').querySelector('a:last-of-type'));
+			}
+			else if (hl.querySelector('.oplink-wrapper a, a.threadbit-threadlink')) {
+				// last unread post
+				window.open(hl.querySelector('.oplink-wrapper a, a.threadbit-threadlink'));
+			}
+			else if (hl.querySelector('a.Quote')) {
+				// quote highlighted post
+				hl.querySelector('a.Quote').click();
+				key.preventDefault();
+			}
 		}
 		else if (!ctrl && code == 82) {
 			// r - reply to thread/post new thread
@@ -604,9 +625,9 @@ function keyShortcuts(key) {
 			else if (document.querySelector(".BoxNewDiscussion a"))
 				document.querySelector(".BoxNewDiscussion a").click();
 		}
-		else if (!ctrl && code == 80 && hl && hl.getElementsByClassName('customspamlink').length > 0) {
-			// p - Report spammer (if https://github.com/28064212/greasemonkey-scripts/raw/master/Boards.ie%20-%20Quick%20Spam%20Reporting.user.js also installed)
-			window.open(hl.getElementsByClassName('customspamlink')[0]);
+		else if (!ctrl && code == 84 && hl && hl.querySelector('.ReactButton-Like')) {
+			// t - toggle thanks of highlighted post
+			hl.querySelector('.ReactButton-Like').click();
 		}
 		else if (!ctrl && code == 88) {
 			// x - toggle previews display
@@ -614,11 +635,11 @@ function keyShortcuts(key) {
 			if (hl.querySelector(".preview-28064212"))
 				hl.querySelector(".preview-28064212").style.display = showpreviews ? "block" : "none";
 		}
-		else if (!ctrl && code == 67) {
-			// c - display category menu
-			window.scrollTo(0, 0);
-			document.querySelector("a[to='/categories']").parentElement.dispatchEvent(new Event('mouseover'));
-			document.querySelector("#categories-28064212").focus();
+		else if (!ctrl && hl && code >= 48 && code <= 57) {
+			// 0-9: open links
+			code = code == 48 ? 10 : code - 49;
+			if (hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)').length > 0 && hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code])
+				window.open(hl.querySelectorAll('.postbit-postbody a:not(.ReactButton)')[code]);
 		}
 		else if (shift && code == 191) {
 			// ? - show/hide documentation
