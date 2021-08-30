@@ -10,7 +10,7 @@
 // @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.4
+// @version 1.4.1
 // ==/UserScript==
 
 let index = -1;
@@ -45,6 +45,11 @@ if (window.top == window.self) {
 			.then(d => {
 				let categories = [];
 				flattenCategories(d, categories);
+				let order = 0;
+				for (let c of categories) {
+					c.order = order;
+					order += 1;
+				}
 				return categories;
 			})
 			.catch(e => console.log(e));
@@ -326,10 +331,53 @@ function postNumbers() {
 	}
 }
 function markCategoriesRead(categoriesPromise) {
+	let catFollowedPage = new URL(window.location).pathname == '/categories' && document.querySelector('.selectBox-selected').textContent == 'Following';
+	if (catFollowedPage)
+		document.querySelector('.forum-threadlist-table tbody').style.opacity = "0.1";
 	categoriesPromise.then(categories => {
-		let checks = document.querySelectorAll("h2.CategoryNameHeading a");
-		for (let c of checks) {
-			let slug = (new URL(c.href)).pathname.replace("/categories/", "");
+		let listed = document.querySelectorAll("h2.CategoryNameHeading a");
+		if (catFollowedPage) {
+			// display all followed on categories page
+			let followed = categories.filter(c => c.followed);
+			let listedArray = Array.from(listed);
+			for (let f of followed) {
+				if (!listedArray.find(a => a.href == f.url)) {
+					let row = document.createElement('tr');
+					row.innerHTML = `<tr class="">
+					<td>
+						<div class="spritethreadbit spritethreadbit-threadunread" title="Thread has no unread posts"></div>
+					</td>
+					<td id="CategoryName">
+						<div class="Wrap">
+							<h2 aria-level='3' class='CategoryNameHeading'><a href="`+ f.url + `" class="threadbit-threadlink">` + f.name + `</a></h2>
+						</div>
+					</td>
+					<td class="forum-threadlist-lastpost">
+						<div class="Block Wrap"><div>
+					</td>
+					<td class="forum-threadlist-replies">
+						<div class="Wrap"></div>
+					</td>
+					<td class="forum-threadlist-replies">
+						<div class="Wrap"></div>
+					</td>
+				</tr>`;
+					document.querySelector('.forum-threadlist-table tbody').appendChild(row);
+				}
+			}
+			let rows = Array.from(document.querySelectorAll('.forum-threadlist-table tbody tr'));
+			rows.sort(function (a, b) {
+				return followed.find(f => f.url == a.querySelector('.CategoryNameHeading a').href).order - followed.find(f => f.url == b.querySelector('.CategoryNameHeading a').href).order
+			});
+			for (let r of rows) {
+				document.querySelector('.forum-threadlist-table tbody').appendChild(r);
+			}
+			document.querySelector('.forum-threadlist-table tbody').style.transition = "opacity 750ms linear";
+			document.querySelector('.forum-threadlist-table tbody').style.opacity = "1";
+		}
+		listed = document.querySelectorAll("h2.CategoryNameHeading a"); // need to get the newly added rows
+		for (let l of listed) {
+			let slug = (new URL(l.href)).pathname.replace("/categories/", "");
 			fetch('/api/v2/discussions/?categoryID=' + categories.find(o => o.slug == slug).id + '&sort=-dateLastComment&pinOrder=mixed')
 				.then(response => {
 					if (response.ok)
@@ -340,7 +388,24 @@ function markCategoriesRead(categoriesPromise) {
 				.then(d => {
 					let unread = d.find(o => o.unread);
 					if (!unread)
-						c.style.fontWeight = "normal";
+						l.style.fontWeight = "normal";
+					// add last post to manually added rows
+					let row = l.parentElement.parentElement.parentElement.parentElement;
+					if (row.querySelector('.forum-threadlist-lastpost .Block').querySelector("a") == null) {
+						let lastPost = new Date(d[0].dateLastComment);
+						let lastPostFormatted = ("0" + lastPost.getDate()).slice(-2) + "-" + ("0" + (lastPost.getMonth() + 1)).slice(-2) + "-" + lastPost.getFullYear().toString().slice(-2) + " " + ("0" + lastPost.getHours()).slice(-2) + ":" + ("0" + lastPost.getMinutes()).slice(-2);
+						row.querySelector('.forum-threadlist-lastpost .Block').innerHTML = `<a href="` + d[0].url + `#latest" class="BlockTitle LatestPostTitle" title="` + d[0].name + `">` + d[0].name + `</a>
+						<div class="Meta">
+							<span>in <a href="` + l.href + `">` + l.textContent + `</a></span>
+						</div>
+						<div class="forum-threadlist-thread-lastpost">` + lastPostFormatted + `</div>
+						<div class="forum-threadlist-thread-lastposter">
+							<a title="View latest post" href="` + d[0].url + `#latest">
+								<div class="spritethreadbit spritethreadbit-latestpost"></div>
+							</a>
+							<a class="threadbit-lastposter" href="` + d[0].insertUser.url + `" title="View profile for">` + d[0].insertUser.name + `</a>
+						</div>`;
+					}
 				})
 				.catch(e => console.log(e));
 		}
