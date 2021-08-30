@@ -10,7 +10,7 @@
 // @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.4.1
+// @version 1.4.2
 // ==/UserScript==
 
 let index = -1;
@@ -367,7 +367,14 @@ function markCategoriesRead(categoriesPromise) {
 			}
 			let rows = Array.from(document.querySelectorAll('.forum-threadlist-table tbody tr'));
 			rows.sort(function (a, b) {
-				return followed.find(f => f.url == a.querySelector('.CategoryNameHeading a').href).order - followed.find(f => f.url == b.querySelector('.CategoryNameHeading a').href).order
+				let first = followed.find(f => f.url == a.querySelector('.CategoryNameHeading a').href);
+				let second = followed.find(f => f.url == b.querySelector('.CategoryNameHeading a').href);
+				if (first === undefined)
+					return 1;
+				else if (second === undefined)
+					return -1;
+				else
+					return first.order - second.order;
 			});
 			for (let r of rows) {
 				document.querySelector('.forum-threadlist-table tbody').appendChild(r);
@@ -378,23 +385,24 @@ function markCategoriesRead(categoriesPromise) {
 		listed = document.querySelectorAll("h2.CategoryNameHeading a"); // need to get the newly added rows
 		for (let l of listed) {
 			let slug = (new URL(l.href)).pathname.replace("/categories/", "");
-			fetch('/api/v2/discussions/?categoryID=' + categories.find(o => o.slug == slug).id + '&sort=-dateLastComment&pinOrder=mixed')
-				.then(response => {
-					if (response.ok)
-						return response.json();
-					else
-						throw new Error(response.statusText);
-				})
-				.then(d => {
-					let unread = d.find(o => o.unread);
-					if (!unread)
-						l.style.fontWeight = "normal";
-					// add last post to manually added rows
-					let row = l.parentElement.parentElement.parentElement.parentElement;
-					if (row.querySelector('.forum-threadlist-lastpost .Block').querySelector("a") == null) {
-						let lastPost = new Date(d[0].dateLastComment);
-						let lastPostFormatted = ("0" + lastPost.getDate()).slice(-2) + "-" + ("0" + (lastPost.getMonth() + 1)).slice(-2) + "-" + lastPost.getFullYear().toString().slice(-2) + " " + ("0" + lastPost.getHours()).slice(-2) + ":" + ("0" + lastPost.getMinutes()).slice(-2);
-						row.querySelector('.forum-threadlist-lastpost .Block').innerHTML = `<a href="` + d[0].url + `#latest" class="BlockTitle LatestPostTitle" title="` + d[0].name + `">` + d[0].name + `</a>
+			if (categories.find(o => o.slug == slug)) {
+				fetch('/api/v2/discussions/?categoryID=' + categories.find(o => o.slug == slug).id + '&sort=-dateLastComment&pinOrder=mixed')
+					.then(response => {
+						if (response.ok)
+							return response.json();
+						else
+							throw new Error(response.statusText);
+					})
+					.then(d => {
+						let unread = d.find(o => o.unread);
+						if (!unread)
+							l.style.fontWeight = "normal";
+						// add last post to manually added rows
+						let row = l.parentElement.parentElement.parentElement.parentElement;
+						if (row.querySelector('.forum-threadlist-lastpost .Block').querySelector("a") == null) {
+							let lastPost = new Date(d[0].dateLastComment);
+							let lastPostFormatted = ("0" + lastPost.getDate()).slice(-2) + "-" + ("0" + (lastPost.getMonth() + 1)).slice(-2) + "-" + lastPost.getFullYear().toString().slice(-2) + " " + ("0" + lastPost.getHours()).slice(-2) + ":" + ("0" + lastPost.getMinutes()).slice(-2);
+							row.querySelector('.forum-threadlist-lastpost .Block').innerHTML = `<a href="` + d[0].url + `#latest" class="BlockTitle LatestPostTitle" title="` + d[0].name + `">` + d[0].name + `</a>
 						<div class="Meta">
 							<span>in <a href="` + l.href + `">` + l.textContent + `</a></span>
 						</div>
@@ -405,9 +413,10 @@ function markCategoriesRead(categoriesPromise) {
 							</a>
 							<a class="threadbit-lastposter" href="` + d[0].insertUser.url + `" title="View profile for">` + d[0].insertUser.name + `</a>
 						</div>`;
-					}
-				})
-				.catch(e => console.log(e));
+						}
+					})
+					.catch(e => console.log(e));
+			}
 		}
 	});
 }
