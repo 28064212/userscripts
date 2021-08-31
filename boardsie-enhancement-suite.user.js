@@ -10,7 +10,7 @@
 // @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.4.2
+// @version 1.4.3
 // ==/UserScript==
 
 let index = -1;
@@ -21,9 +21,8 @@ if (window.top == window.self) {
 
 	(async () => {
 		settings = await GM.getValue('settings', {});
-		// default autobookmark to true
-		if (settings.autobookmark === undefined)
-			settings.autobookmark = true;
+		if (settings.autobookmark)
+			delete settings.autobookmark;
 		if (settings.keyboard === undefined)
 			settings.keyboard = true;
 
@@ -72,7 +71,6 @@ if (window.top == window.self) {
 	addThreadPreviews();
 	highlightOP();
 	postNumbers();
-	autoBookmark();
 	markCategoriesRead(categoriesPromise);
 
 	addBookmarkStatusToComments();
@@ -133,20 +131,16 @@ async function settingsModal() {
 		behaviours.classList.add("settings-values-28064212");
 		behaviours.id = "settings-behaviours-28064212";
 		content.appendChild(behaviours);
-		behaviours.innerHTML += '<p><input type="checkbox" id="settings-autobookmark-28064212" /><label for="settings-autobookmark-28064212">Automatically bookmark discussions when you create or comment on them</label></p>';
-		behaviours.innerHTML += '<p><input type="checkbox" id="settings-keyboard-28064212" /><label for="settings-keyboard-28064212">Enable keyboard shortcuts (requires refresh)</label></p>';
-
-		let autobookmark = behaviours.querySelector('#settings-autobookmark-28064212');
-		autobookmark.checked = settings.autobookmark;
-		autobookmark.addEventListener('change', async function (e) {
-			settings.autobookmark = autobookmark.checked;
-			await GM.setValue("settings", settings);
-		});
+		behaviours.innerHTML += '<p><input type="checkbox" id="settings-keyboard-28064212" /><label for="settings-keyboard-28064212">Enable keyboard shortcuts</label></p>';
 
 		let keyboard = behaviours.querySelector('#settings-keyboard-28064212');
 		keyboard.checked = settings.keyboard;
 		keyboard.addEventListener('change', async function (e) {
 			settings.keyboard = keyboard.checked;
+			if (settings.keyboard)
+				window.addEventListener('keydown', keyShortcuts, true);
+			else
+				window.removeEventListener('keydown', keyShortcuts, true);
 			await GM.setValue("settings", settings);
 		});
 	}
@@ -297,19 +291,6 @@ function flattenCategories(data, categories) {
 			flattenCategories(d.children, categories)
 	}
 }
-function autoBookmark() {
-	let postButton = document.querySelector('#Form_PostComment');
-	if (postButton) {
-		postButton.addEventListener('click', function () {
-			if (settings.autobookmark) {
-				if (document.querySelector('a.Bookmark') && document.querySelector('a.Bookmarked') == null) {
-					document.querySelector('a.Bookmark').click();
-					createAlert("Discussion bookmarked");
-				}
-			}
-		});
-	}
-}
 function postNumbers() {
 	let posts = document.querySelectorAll('.Comments .postbit-header');
 	if (posts.length > 0) {
@@ -332,10 +313,11 @@ function postNumbers() {
 }
 function markCategoriesRead(categoriesPromise) {
 	let catFollowedPage = new URL(window.location).pathname == '/categories' && document.querySelector('.selectBox-selected').textContent == 'Following';
-	if (catFollowedPage)
-		document.querySelector('.forum-threadlist-table tbody').style.opacity = "0.1";
+	let listed = document.querySelectorAll("h2.CategoryNameHeading a");
+	for (let l of listed) {
+		l.style.opacity = "0.1";
+	}
 	categoriesPromise.then(categories => {
-		let listed = document.querySelectorAll("h2.CategoryNameHeading a");
 		if (catFollowedPage) {
 			// display all followed on categories page
 			let followed = categories.filter(c => c.followed);
@@ -379,8 +361,6 @@ function markCategoriesRead(categoriesPromise) {
 			for (let r of rows) {
 				document.querySelector('.forum-threadlist-table tbody').appendChild(r);
 			}
-			document.querySelector('.forum-threadlist-table tbody').style.transition = "opacity 750ms linear";
-			document.querySelector('.forum-threadlist-table tbody').style.opacity = "1";
 		}
 		listed = document.querySelectorAll("h2.CategoryNameHeading a"); // need to get the newly added rows
 		for (let l of listed) {
@@ -414,6 +394,8 @@ function markCategoriesRead(categoriesPromise) {
 							<a class="threadbit-lastposter" href="` + d[0].insertUser.url + `" title="View profile for">` + d[0].insertUser.name + `</a>
 						</div>`;
 						}
+						l.style.transition = "opacity 750ms linear";
+						l.style.opacity = "1";
 					})
 					.catch(e => console.log(e));
 			}
@@ -599,6 +581,15 @@ function addBookmarkStatusToComments() {
 									svg.querySelector('path').style.fill = "none";
 								c.querySelector(".ItemContent").insertBefore(svg, c.querySelector(".ItemContent").firstChild);
 								c.classList.add("bookmark-status-28064212");
+
+								let score = commentData.find(item => item.commentID == id) ? commentData.find(item => item.commentID == id).score : null;
+								if (score) {
+									let s = document.createElement('span');
+									s.className = 'MItem';
+									s.style.float = "right";
+									s.textContent = '(' + score + ')';
+									c.querySelector('.Meta').appendChild(s);
+								}
 							}
 						})
 						.catch(error => console.log(error));;
