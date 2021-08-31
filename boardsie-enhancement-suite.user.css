@@ -231,7 +231,7 @@ body {
 
 .thanks-28064212 {
 	display: flex;
-	background-color: white;
+	background-color: var(--bg) !important;
 	border-top: 1px solid #e2e2e2;
 	font-size: 0.9em;
 	font-weight: bold;
@@ -241,7 +241,7 @@ body {
 	min-width: 246px;
 	text-align: right;
 	padding: 10px;
-	background-color: rgb(249, 249, 249)
+	background-color: var(--bg-userinfo) !important;
 }
 .thanks-28064212 div:last-child {
 	text-align: left;
@@ -273,7 +273,8 @@ body {
 	min-width: 900px;
 	transform: translate(-50%, -50%);
 	position: fixed;
-	background-color: white;
+	background-color: var(--bg);
+	color: var(--fg);
 	padding: 20px 0;
 	border-radius: 3px;
 	box-shadow: 3px 3px 11px 0 rgba(0, 0, 0);
@@ -306,7 +307,7 @@ body {
 }
 #docs-content-28064212 td kbd {
 	font-family: monospace;
-	background-color: #f1f1f1;
+	background-color: rgba(255, 255, 255, .1);
 	padding: 2px 4px;
 	margin-left: 8px;
 	box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, .4);
@@ -324,8 +325,8 @@ body {
 	padding: 5px 10px !important;
 	width: max-content;
 	top: 40px;
-	background-color: white;
-	color: rgb(51, 51, 51);
+	background-color: var(--bg);
+	color: var(--fg);
 	font-weight: normal;
 	border-radius: 5px;
 	z-index: 100;
@@ -347,7 +348,7 @@ body {
 	top: 47px;
 	left: 5vw;
 	width: 90vw;
-	background-color: white;
+	background-color: var(--bg);
 	color: rgb(51, 51, 51);
 	transition-delay: 0.1s;
 	border-radius: 5px;
@@ -469,13 +470,14 @@ body {
 }
 #settings-content-28064212 {
 	display: grid;
-	grid-template-columns: auto minmax(0, 1fr);;
+	grid-template-columns: auto minmax(0, 1fr);
 	top: 50px;
 	left: 50%;
 	min-width: 900px;
 	transform: translateX(-50%);
 	position: fixed;
-	background-color: white;
+	background-color: var(--bg);
+	color: var(--fg);
 	padding: 20px 10px;
 	border-radius: 3px;
 	box-shadow: 3px 3px 11px 0 rgba(0, 0, 0);
@@ -508,4 +510,26 @@ body {
 .alert-28064212 {
 	opacity: 1;
 	transition: opacity 2000ms linear;
+}
+
+/* dark mode */
+
+body {
+	--bg: rgb(255, 255, 255);
+	--bg-userinfo: rgb(249, 249, 249);
+}
+body[data-theme='dark'] {
+	--bg: rgb(21, 32, 43);
+	--bg-userinfo: var(--bg);
+	--bg-quotes: rgb(37, 51, 65);
+	--fg: rgb(255, 255, 255);
+	--fg-dim: rgb(136, 153, 166);
+}
+body[data-theme='dark'], body[data-theme='dark'] .Frame, body[data-theme='dark'] .postbit-postdetails, body[data-theme='dark'] .postbit-userinfo, body[data-theme='dark'] .postbit-postbody, body[data-theme='dark'] .Message.userContent, body[data-theme='dark'] .forum-threadlist-wrapper {
+	background-color: var(--bg) !important;
+	color: var(--fg) !important;
+}
+body[data-theme='dark'] .embedExternal, body[data-theme='dark'] .embedExternal [class$="collapsableContent"], body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-lastpost, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-replies, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-views {
+	background-color: var(--bg-quotes) !important;
+	color: var(--fg) !important;
 }
