@@ -148,6 +148,9 @@ header, .BreadcrumbsBox {
 .userContent h2[class$="embed-title"] {
 	white-space: normal !important;
 }
+.richEditor-text > :not([contenteditable="false"]) a {
+	text-decoration: underline !important;
+}
 
 /* forums */
 
@@ -427,7 +430,7 @@ body {
 	padding-right: 5px;
 	border-radius: 5px;
 }
-.original-poster-28064212, .original-poster-28064212 span {
+.original-poster-28064212, .original-poster-28064212 .userinfo-username-title {
 	background-color: rgb(59, 85, 134) !important;
 	color: white !important;
 }
@@ -436,9 +439,10 @@ body {
 
 .postcount-28064212 {
 	float: right;
-	font-size: 11px;
+	font-size: 12px;
 	color: white;
 	padding-left: 5px;
+	font-weight: bold;
 }
 .postcount-28064212:hover {
 	color: white
@@ -533,7 +537,7 @@ body[data-theme='dark'] {
 	--fg-dim: rgb(136, 153, 166);
 	--fg-link: rgb(27, 149, 224);
 }
-body[data-theme='dark'], body[data-theme='dark'] .Frame, body[data-theme='dark'] .postbit-postdetails, body[data-theme='dark'] .postbit-userinfo, body[data-theme='dark'] .postbit-postbody, body[data-theme='dark'] .Message.userContent, body[data-theme='dark'] .forum-threadlist-wrapper, body[data-theme='dark'] #themeFooter, body[data-theme='dark'] #homepage-tabs a, body[data-theme='dark'] .module-wrapper tbody .threadrow-container, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-lastpost, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-replies, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-views, body[data-theme='dark'] .generic-block-wrapper, body[data-theme='dark'] .MenuItems, body[data-theme='dark'] .NewCommentCount {
+body[data-theme='dark'], body[data-theme='dark'] .Frame, body[data-theme='dark'] .postbit-postdetails, body[data-theme='dark'] .postbit-userinfo, body[data-theme='dark'] .postbit-postbody, body[data-theme='dark'] .Message.userContent, body[data-theme='dark'] .forum-threadlist-wrapper, body[data-theme='dark'] #themeFooter, body[data-theme='dark'] #homepage-tabs a, body[data-theme='dark'] .module-wrapper tbody .threadrow-container, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-lastpost, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-replies, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-views, body[data-theme='dark'] .generic-block-wrapper, body[data-theme='dark'] .MenuItems, body[data-theme='dark'] .NewCommentCount, body[data-theme='dark'] .richEditor-text {
 	background-color: var(--bg) !important;
 	color: var(--fg) !important;
 }
@@ -546,11 +550,11 @@ body[data-theme='dark'] .module-wrapper tbody .threadrow-container-zebra td {
 	background-color: var(--bg-quotes);
 	color: var(--fg) !important;
 }
-body[data-theme='dark'] .embedExternal, body[data-theme='dark'] .embedExternal [class$="collapsableContent"] {
+body[data-theme='dark'] .embedExternal, body[data-theme='dark'] .embedExternal [class$="collapsableContent"], body[data-theme='dark'] .richEditor-frame, body[data-theme='dark'] .richEditor-menuItem button {
 	background-color: var(--bg-quotes) !important;
 	color: var(--fg) !important;
 }
-body[data-theme='dark'] a, body[data-theme='dark'] .userinfo-username-title {
+body[data-theme='dark'] a, body[data-theme='dark'] a:not(.original-poster-28064212) .userinfo-username-title {
 	color: var(--fg-link) !important;
 }
 body[data-theme='dark'] td, body[data-theme='dark'] table {
