@@ -217,7 +217,7 @@ body {
 	counter-reset: linkcounter;
 }
 .highlight-28064212, .highlight-28064212 td:first-child {
-	box-shadow: inset 5px 0px 0px 0px #3b5586 !important;
+	box-shadow: inset 5px 0px 0px 0px var(--fg-link) !important;
 }
 .highlight-28064212 .postbit-postbody a:not(.ReactButton)::after {
 	counter-increment: linkcounter;
@@ -331,7 +331,7 @@ body {
 	border-radius: 5px;
 	z-index: 100;
 	max-width: 50vw;
-	border: 1px solid #3b5586;
+	border: 1px solid var(--fg-link);
 	max-height: 150px;
 	box-sizing: border-box;
 	text-overflow: ellipsis;
@@ -455,6 +455,12 @@ body {
 	font-size: 24px;
 	border-radius: 6px;
 }
+.menu-separator-28064212 {
+	height: 36px;
+	width: 1px;
+	margin: 0 4px;
+	background-color: white;
+}
 #settings-icon-28064212:hover, #docs-icon-28064212:hover {
 	background-color: rgba(255, 255, 255, 0.1);
 }
@@ -517,19 +523,42 @@ body {
 body {
 	--bg: rgb(255, 255, 255);
 	--bg-userinfo: rgb(249, 249, 249);
+	--fg-link: rgb(59, 85, 134);
 }
 body[data-theme='dark'] {
 	--bg: rgb(21, 32, 43);
 	--bg-userinfo: var(--bg);
 	--bg-quotes: rgb(37, 51, 65);
-	--fg: rgb(255, 255, 255);
+	--fg: rgb(221, 221, 221);
 	--fg-dim: rgb(136, 153, 166);
+	--fg-link: rgb(27, 149, 224);
 }
-body[data-theme='dark'], body[data-theme='dark'] .Frame, body[data-theme='dark'] .postbit-postdetails, body[data-theme='dark'] .postbit-userinfo, body[data-theme='dark'] .postbit-postbody, body[data-theme='dark'] .Message.userContent, body[data-theme='dark'] .forum-threadlist-wrapper {
+body[data-theme='dark'], body[data-theme='dark'] .Frame, body[data-theme='dark'] .postbit-postdetails, body[data-theme='dark'] .postbit-userinfo, body[data-theme='dark'] .postbit-postbody, body[data-theme='dark'] .Message.userContent, body[data-theme='dark'] .forum-threadlist-wrapper, body[data-theme='dark'] #themeFooter, body[data-theme='dark'] #homepage-tabs a, body[data-theme='dark'] .module-wrapper tbody .threadrow-container, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-lastpost, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-replies, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-views, body[data-theme='dark'] .generic-block-wrapper, body[data-theme='dark'] .MenuItems, body[data-theme='dark'] .NewCommentCount {
 	background-color: var(--bg) !important;
 	color: var(--fg) !important;
 }
-body[data-theme='dark'] .embedExternal, body[data-theme='dark'] .embedExternal [class$="collapsableContent"], body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-lastpost, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-replies, body[data-theme='dark'] .forum-threadlist-wrapper tbody .forum-threadlist-views {
+body[data-theme='dark'] .Reactions span, body[data-theme='dark'] .Reactions a {
+	background-color: var(--bg) !important;
+	background: var(--bg) !important;
+	color: var(--fg) !important;
+}
+body[data-theme='dark'] .module-wrapper tbody .threadrow-container-zebra td {
+	background-color: var(--bg-quotes);
+	color: var(--fg) !important;
+}
+body[data-theme='dark'] .embedExternal, body[data-theme='dark'] .embedExternal [class$="collapsableContent"] {
 	background-color: var(--bg-quotes) !important;
 	color: var(--fg) !important;
+}
+body[data-theme='dark'] a, body[data-theme='dark'] .userinfo-username-title {
+	color: var(--fg-link) !important;
+}
+body[data-theme='dark'] td, body[data-theme='dark'] table {
+	border-color: var(--fg-dim) !important;
+}
+body[data-theme='dark'] .postcount-28064212 {
+	color: var(--fg) !important;
+}
+body[data-theme='dark'] #titleBar a, body[data-theme='dark'] .Breadcrumbs a, body[data-theme='dark'] .ButtonGroup a, body[data-theme='dark'] .Tag-Sticky, body[data-theme='dark'] .timestamp-wrapper {
+	color: inherit !important;
 }
