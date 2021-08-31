@@ -10,7 +10,7 @@
 // @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.4.3
+// @version 1.5
 // ==/UserScript==
 
 let index = -1;
@@ -19,15 +19,25 @@ let settings = {};
 if (window.top == window.self) {
 	GM.addStyle(GM_getResourceText("css"));
 
+	try {
+		document.querySelector('#themeFooter').shadowRoot.querySelector('.footer').style.background = "inherit";
+		document.querySelector('#themeFooter').shadowRoot.querySelector('.footer').style.color = "inherit";
+	}
+	catch (e) { }
+
 	(async () => {
 		settings = await GM.getValue('settings', {});
 		if (settings.autobookmark)
 			delete settings.autobookmark;
 		if (settings.keyboard === undefined)
 			settings.keyboard = true;
+		if (settings.darkmode === undefined)
+			settings.darkmode = false;
 
 		if (settings.keyboard)
 			window.addEventListener('keydown', keyShortcuts, true);
+		if (settings.darkmode)
+			document.body.dataset.theme = 'dark'
 		await GM.setValue("settings", settings);
 	})();
 
@@ -92,6 +102,11 @@ function titleBarObserver(mutationList, observer, categoriesPromise) {
 }
 function menuItems() {
 	let meBox = document.querySelector('.meBox');
+
+	let sep = document.createElement('div');
+	sep.classList.add('menu-separator-28064212');
+	meBox.insertBefore(sep, meBox.lastElementChild);
+
 	let a = document.createElement('a');
 	a.innerHTML = '⚙';
 	a.id = 'settings-icon-28064212';
@@ -103,15 +118,24 @@ function menuItems() {
 	a.id = 'docs-icon-28064212';
 	meBox.insertBefore(a, meBox.lastElementChild);
 	a.addEventListener('click', docsModal);
+
+	sep = document.createElement('div');
+	sep.classList.add('menu-separator-28064212');
+	meBox.insertBefore(sep, meBox.lastElementChild);
 }
 async function settingsModal() {
 	let settingsModal = document.querySelector('#settings-28064212');
 	if (settingsModal) {
 		settingsModal.style.display = settingsModal.style.display == 'none' ? 'block' : 'none';
+		if (settingsModal.style.display == 'block')
+			settingsModal.focus();
+		else
+			settingsModal.blur();
 	}
 	else {
 		settingsModal = document.createElement('div');
 		settingsModal.id = 'settings-28064212';
+		settingsModal.tabIndex = "-1";
 		settingsModal.addEventListener('click', function (e) {
 			if (e.target == settingsModal)
 				e.target.style.display = 'none';
@@ -132,6 +156,7 @@ async function settingsModal() {
 		behaviours.id = "settings-behaviours-28064212";
 		content.appendChild(behaviours);
 		behaviours.innerHTML += '<p><input type="checkbox" id="settings-keyboard-28064212" /><label for="settings-keyboard-28064212">Enable keyboard shortcuts</label></p>';
+		behaviours.innerHTML += '<p><input type="checkbox" id="settings-darkmode-28064212" /><label for="settings-darkmode-28064212">Dark Mode</label></p>';
 
 		let keyboard = behaviours.querySelector('#settings-keyboard-28064212');
 		keyboard.checked = settings.keyboard;
@@ -143,6 +168,18 @@ async function settingsModal() {
 				window.removeEventListener('keydown', keyShortcuts, true);
 			await GM.setValue("settings", settings);
 		});
+
+		let darkmode = behaviours.querySelector('#settings-darkmode-28064212');
+		darkmode.checked = settings.darkmode;
+		darkmode.addEventListener('change', async function (e) {
+			settings.darkmode = darkmode.checked;
+			if (settings.darkmode)
+				document.body.dataset.theme = 'dark';
+			else
+				delete document.body.dataset.theme;
+			await GM.setValue("settings", settings);
+		});
+		settingsModal.focus();
 	}
 }
 function docsModal() {
@@ -741,7 +778,7 @@ function keyShortcuts(key) {
 	let ctrl = key.ctrlKey;
 	let alt = key.altKey;
 	let shift = key.shiftKey;
-	let intext = (document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT' || document.activeElement.contentEditable == "true");
+	let intext = (document.activeElement.nodeName == 'TEXTAREA' || (document.activeElement.nodeName == 'INPUT' && document.activeElement.type != 'checkbox') || document.activeElement.contentEditable == "true");
 	let hl = document.getElementsByClassName('highlight-28064212')[0];
 	if (!intext) {
 		if (ctrl && code == 32 && document.querySelector('button[title=Search]')) {
