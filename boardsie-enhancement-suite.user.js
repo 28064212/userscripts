@@ -10,7 +10,7 @@
 // @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.5
+// @version 1.5.1
 // ==/UserScript==
 
 let index = -1;
@@ -80,7 +80,6 @@ if (window.top == window.self) {
 	addThanksAfterPosts();
 	addThreadPreviews();
 	highlightOP();
-	postNumbers();
 	markCategoriesRead(categoriesPromise);
 
 	addBookmarkStatusToComments();
@@ -130,7 +129,7 @@ async function settingsModal() {
 		if (settingsModal.style.display == 'block')
 			settingsModal.focus();
 		else
-			settingsModal.blur();
+			document.activeElement.blur();
 	}
 	else {
 		settingsModal = document.createElement('div');
@@ -328,26 +327,6 @@ function flattenCategories(data, categories) {
 			flattenCategories(d.children, categories)
 	}
 }
-function postNumbers() {
-	let posts = document.querySelectorAll('.Comments .postbit-header');
-	if (posts.length > 0) {
-		let page = (document.querySelector(".Pager .Highlight") ? document.querySelector(".Pager .Highlight").textContent : 1) - 1;
-		let start = 0;
-		if (page != 0)
-			start = (page * 30) + 1;
-		for (let i = 0; i < posts.length; i++) {
-			let count = document.createElement('a');
-			count.classList.add('postcount-28064212')
-			count.textContent = '#' + (start + i + 1);
-			posts[i].insertBefore(count, posts[i].firstElementChild.nextElementSibling);
-			let commentid = posts[i].parentElement.parentElement.parentElement.id.replace('Comment_', '');
-			if (commentid == '')
-				count.href = gdn.meta.eventData.discussion.url + '/p1';
-			else
-				count.href = '/discussion/comment/' + commentid + '#Comment_' + commentid;
-		}
-	}
-}
 function markCategoriesRead(categoriesPromise) {
 	let catFollowedPage = new URL(window.location).pathname == '/categories' && document.querySelector('.selectBox-selected').textContent == 'Following';
 	let listed = document.querySelectorAll("h2.CategoryNameHeading a");
@@ -475,46 +454,69 @@ function addThreadPreviews() {
 				for (let l of links) {
 					let path = new URL(l.href).pathname.replace('/discussion/', '');
 					let id = path.slice(0, path.indexOf('/'));
-					for (let d of data) {
-						if (d.discussionID == id) {
-							let preview = document.createElement("div");
-							preview.classList.add("preview-28064212");
-							preview.innerHTML = d.body ? d.body : "";
+					let d = data.find(n => n.discussionID == id);
+					if (d) {
+						let preview = document.createElement("div");
+						preview.classList.add("preview-28064212");
+						preview.innerHTML = d.body ? d.body : "";
+						preview.style.display = "none";
+						let parent = null;
+						if (l.parentElement.classList.contains("threadlink-wrapper")) {
+							parent = l.parentElement.parentElement;
+							preview.style.top = '28px';
+							parent.appendChild(preview);
+							preview.parentElement.title = '';
+							// unbolds read threads on homepage
+							if (d.unread == false) {
+								l.style.fontWeight = "normal";
+							}
+						}
+						else {
+							parent = l.parentElement;
+							preview.style.top = '46px';
+							parent.appendChild(preview);
+						}
+						l.addEventListener('mouseover', function (e) {
+							preview.style.display = "block";
+						});
+						l.addEventListener('mouseout', function (e) {
 							preview.style.display = "none";
-							let parent = null;
-							if (l.parentElement.classList.contains("threadlink-wrapper")) {
-								parent = l.parentElement.parentElement;
-								preview.style.top = '28px';
-								parent.appendChild(preview);
-								preview.parentElement.title = '';
-								// unbolds read threads on homepage
-								if (d.unread == false) {
-									l.style.fontWeight = "normal";
+						});
+
+						if (d.bookmarked) {
+							let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+							svg.setAttribute("viewBox", "0 0 12.733 16.394");
+							svg.innerHTML = '<title>Bookmark</title><path class="svgBookmark-mainPath" stroke-width="2" d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"></path>';
+							svg.style.height = "16px";
+							svg.style.width = "12px";
+							svg.style.float = "right";
+							svg.style.marginLeft = "10px";
+							svg.querySelector('path').style.stroke = "rgb(59, 85, 134)";
+							svg.querySelector('path').style.fill = "rgb(59, 85, 134)";
+							parent.insertBefore(svg, parent.querySelector('.Category, .oplink-wrapper'));
+						}
+
+						if (l.classList.contains("threadbit-threadlink")) {
+							try {
+								let row = l.parentElement.parentElement;
+								let cell = row.lastElementChild;
+								cell.className = "";
+								let firstPost = new Date(d.dateInserted);
+								let firstPostFormatted = ("0" + firstPost.getDate()).slice(-2) + "-" + ("0" + (firstPost.getMonth() + 1)).slice(-2) + "-" + firstPost.getFullYear().toString().slice(-2) + " " + ("0" + firstPost.getHours()).slice(-2) + ":" + ("0" + firstPost.getMinutes()).slice(-2);
+								cell.innerHTML = '<div style="float:right">' +
+									'<a title="View first post" href="' + d.url + '"><div class="spritethreadbit spritethreadbit-latestpost"></div></a> ' +
+									'<a class="threadbit-lastposter" href="' + d.insertUser.url + '">' + d.insertUser.name + '</a></div><div>' + firstPostFormatted + '</div>';
+								row.removeChild(cell);
+								row.insertBefore(cell, row.lastElementChild);
+								let table = l.closest('table:not(firstpost-added-28064212)');
+								if (table) {
+									table.querySelector('th.forum-threadlist-replies').innerHTML = 'First post';
+									//need to set a clasee, then width 17%
+									table.querySelector('th.forum-threadlist-views').innerHTML = 'Replies';
+									table.classList.add('firstpost-added-28064212');
 								}
 							}
-							else {
-								parent = l.parentElement;
-								preview.style.top = '46px';
-								parent.appendChild(preview);
-							}
-							l.addEventListener('mouseover', function (e) {
-								preview.style.display = "block";
-							});
-							l.addEventListener('mouseout', function (e) {
-								preview.style.display = "none";
-							});
-							if (d.bookmarked) {
-								let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-								svg.setAttribute("viewBox", "0 0 12.733 16.394");
-								svg.innerHTML = '<title>Bookmark</title><path class="svgBookmark-mainPath" stroke-width="2" d="M1.05.5H11.683a.55.55,0,0,1,.55.55h0V15.341a.549.549,0,0,1-.9.426L6.714,12a.547.547,0,0,0-.7,0L1.4,15.767a.55.55,0,0,1-.9-.426V1.05A.55.55,0,0,1,1.05.5z"></path>';
-								svg.style.height = "16px";
-								svg.style.width = "12px";
-								svg.style.float = "right";
-								svg.style.marginLeft = "10px";
-								svg.querySelector('path').style.stroke = "rgb(59, 85, 134)";
-								svg.querySelector('path').style.fill = "rgb(59, 85, 134)";
-								parent.insertBefore(svg, parent.querySelector('.Category, .oplink-wrapper'));
-							}
+							catch (e) { console.log(e) }
 						}
 					}
 				}
