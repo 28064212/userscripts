@@ -10,7 +10,7 @@
 // @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.5.1
+// @version 1.5.2
 // ==/UserScript==
 
 let index = -1;
@@ -27,8 +27,8 @@ if (window.top == window.self) {
 
 	(async () => {
 		settings = await GM.getValue('settings', {});
-		if (settings.autobookmark)
-			delete settings.autobookmark;
+		if (settings.autobookmark === undefined)
+			settings.autobookmark = true;
 		if (settings.keyboard === undefined)
 			settings.keyboard = true;
 		if (settings.darkmode === undefined)
@@ -38,6 +38,8 @@ if (window.top == window.self) {
 			window.addEventListener('keydown', keyShortcuts, true);
 		if (settings.darkmode)
 			document.body.dataset.theme = 'dark'
+		if (document.querySelector('#Form_Bookmarked') && settings.autobookmark == false)
+			document.querySelector('#Form_Bookmarked').checked = false
 		await GM.setValue("settings", settings);
 	})();
 
@@ -154,8 +156,9 @@ async function settingsModal() {
 		behaviours.classList.add("settings-values-28064212");
 		behaviours.id = "settings-behaviours-28064212";
 		content.appendChild(behaviours);
-		behaviours.innerHTML += '<p><input type="checkbox" id="settings-keyboard-28064212" /><label for="settings-keyboard-28064212">Enable keyboard shortcuts</label></p>';
 		behaviours.innerHTML += '<p><input type="checkbox" id="settings-darkmode-28064212" /><label for="settings-darkmode-28064212">Dark Mode</label></p>';
+		behaviours.innerHTML += '<p><input type="checkbox" id="settings-autobookmark-28064212" /><label for="settings-autobookmark-28064212">Automatically set "Bookmark this discussion"</label></p>';
+		behaviours.innerHTML += '<p><input type="checkbox" id="settings-keyboard-28064212" /><label for="settings-keyboard-28064212">Enable keyboard shortcuts</label></p>';
 
 		let keyboard = behaviours.querySelector('#settings-keyboard-28064212');
 		keyboard.checked = settings.keyboard;
@@ -178,6 +181,16 @@ async function settingsModal() {
 				delete document.body.dataset.theme;
 			await GM.setValue("settings", settings);
 		});
+
+		let autoBookmark = behaviours.querySelector('#settings-autobookmark-28064212');
+		autoBookmark.checked = settings.autobookmark;
+		autoBookmark.addEventListener('change', async function (e) {
+			settings.autobookmark = autoBookmark.checked;
+			if (document.querySelector('#Form_Bookmarked') && settings.autobookmark == false)
+				document.querySelector('#Form_Bookmarked').checked = false
+			await GM.setValue("settings", settings);
+		});
+
 		settingsModal.focus();
 	}
 }
