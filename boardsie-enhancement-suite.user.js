@@ -10,7 +10,7 @@
 // @grant GM.setValue
 // @include /^https?://(www\.)?boards\.ie/.*/
 // @description Enhancements for Boards.ie
-// @version 1.5.2
+// @version 1.5.3
 // ==/UserScript==
 
 let index = -1;
@@ -33,6 +33,8 @@ if (window.top == window.self) {
 			settings.keyboard = true;
 		if (settings.darkmode === undefined)
 			settings.darkmode = false;
+		if (settings.updatenotice === undefined)
+			settings.updatenotice = true;
 
 		if (settings.keyboard)
 			window.addEventListener('keydown', keyShortcuts, true);
@@ -40,6 +42,10 @@ if (window.top == window.self) {
 			document.body.dataset.theme = 'dark'
 		if (document.querySelector('#Form_Bookmarked') && settings.autobookmark == false)
 			document.querySelector('#Form_Bookmarked').checked = false
+		if (settings.updatenotice) {
+			settings.updatenotice = false;
+			settingsModal();
+		}
 		await GM.setValue("settings", settings);
 	})();
 
@@ -142,12 +148,36 @@ async function settingsModal() {
 				e.target.style.display = 'none';
 		});
 		document.body.appendChild(settingsModal);
+
 		let content = document.createElement('div');
 		content.id = 'settings-content-28064212';
 		settingsModal.appendChild(content);
 		let header = document.createElement("p");
-		header.innerHTML = "Boardsie Enhancement Suite - Settings";
+		header.innerHTML = "Boardsie Enhancement Suite";
 		content.appendChild(header);
+
+		let updateNotice = document.createElement('p');
+		updateNotice.appendChild(document.createTextNode("NOTICE: This script is no longer in development. All support and new features have been moved to the browser extension version. You can see more information about the new extension on this "));
+		let updateLink = document.createElement('a');
+		updateLink.textContent = "boards thread";
+		updateLink.href = 'https://www.boards.ie/discussion/2058208910/boardsie-enhancement-suite-browser-extension/';
+		updateLink.style.fontSize = 'inherit';
+		updateNotice.appendChild(updateLink);
+		updateNotice.appendChild(document.createTextNode(", and by visiting the "));
+		let extensionLink = document.createElement('a');
+		extensionLink.textContent = "extension homepage";
+		extensionLink.href = 'https://github.com/28064212/boardsie-enhancement-suite';
+		extensionLink.style.fontSize = 'inherit';
+		updateNotice.appendChild(extensionLink);
+		updateNotice.appendChild(document.createTextNode('.'))
+		content.appendChild(updateNotice);
+
+		let updateNotice2 = document.createElement('p');
+		updateNotice2.appendChild(document.createTextNode("This notice will only automatically appear once. However, you can bring it up at any time by clicking the Settings icon (gear-wheel, top-right), or by pressing 's'."));
+		updateNotice2.style.fontSize = "16px";
+		updateNotice2.style.borderBottom = "1px solid rgb(0, 0, 0, 0.4)";
+		content.appendChild(updateNotice2);
+
 		let lhm = document.createElement("div");
 		lhm.innerHTML = "<p>Behaviour</p>";
 		content.appendChild(lhm);
