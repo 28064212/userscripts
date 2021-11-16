@@ -6,7 +6,7 @@
 // @include /^https?://(www\.)?myfitnesspal\.com/user/.*/diary/add\?.*/
 // @match https://www.myfitnesspal.com/food/diary*
 // @match https://www.myfitnesspal.com/food/search
-// @version 1.4
+// @version 1.4.1
 // @description	a/z for up/down, q to select, w to select quantity, shift+d delete all
 // ==/UserScript==
 
@@ -94,7 +94,7 @@ function keyShortcuts(key) {
 		else if (document.getElementById('recipes').style.display != 'none')
 			document.querySelector('#recent_tab a').click();
 	}
-	else if (code == 65 || code == 90) {
+	else if (!ctrl && (code == 65 || code == 90)) {
 		// a/z
 		key.preventDefault();
 		let list = [];
@@ -114,7 +114,7 @@ function keyShortcuts(key) {
 			index = -1;
 		if (index == -1) {
 			if (code == 65) {
-				if (ctrl)
+				if (shift)
 					index = 0;
 				else {
 					for (let j = list.length - 1; j > 0 && index == -1; j--) {
@@ -126,7 +126,7 @@ function keyShortcuts(key) {
 				}
 			}
 			else if (code == 90) {
-				if (ctrl)
+				if (shift)
 					index = list.length - 1;
 				else {
 					for (let j = 0; j < list.length && index == -1; j++) {
@@ -139,13 +139,13 @@ function keyShortcuts(key) {
 			}
 		}
 		else if (code == 65 && index > 0) {
-			if (ctrl)
+			if (shift)
 				index = 0;
 			else
 				index--;
 		}
 		else if (code == 90 && index < list.length - 1) {
-			if (ctrl)
+			if (shift)
 				index = list.length - 1;
 			else
 				index++;
@@ -159,7 +159,10 @@ function keyShortcuts(key) {
 	else if (code == 81 && hl != null) {
 		// q - select
 		hl.querySelector(".checkbox").click();
-		// hl.querySelector(".checkbox").focus();
+		key.preventDefault();
+	}
+	else if (code == 87 && hl != null) {
+		// w - prevent muscle memory
 		key.preventDefault();
 	}
 	else if (!intext && shift && code == 68) {
