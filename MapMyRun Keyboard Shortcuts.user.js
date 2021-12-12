@@ -53,18 +53,20 @@ function keyShortcuts(key) {
             }
         }
         else {
-            var oks = Array.prototype.slice.call(document.getElementsByTagName('span')).filter(el => el.textContent.trim() === 'OK');
-            if (oks.length > 0) {
-                // confirm deletion
-                oks[0].click();
-            }
-            else {
-                // 1/Enter-9 to delete routes
-                var dels = Array.prototype.slice.call(document.getElementsByTagName('a')).filter(el => el.textContent.trim() === 'Delete');
-                code = code == 13 ? 49 : code; // set enter = 1
-                var num = code - 49;
-                if (dels.length > 0 && num + 1 <= dels.length) {
-                    dels[num].click();
+            if (document.activeElement.nodeName !== "INPUT") {
+                var oks = Array.prototype.slice.call(document.getElementsByTagName('span')).filter(el => el.textContent.trim() === 'OK');
+                if (oks.length > 0) {
+                    // confirm deletion
+                    oks[0].click();
+                }
+                else {
+                    // 1/Enter-9 to delete routes
+                    var dels = Array.prototype.slice.call(document.getElementsByTagName('a')).filter(el => el.textContent.trim() === 'Delete');
+                    code = code == 13 ? 49 : code; // set enter = 1
+                    var num = code - 49;
+                    if (dels.length > 0 && num + 1 <= dels.length) {
+                        dels[num].click();
+                    }
                 }
             }
         }
