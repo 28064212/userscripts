@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/userscripts
 // @match       https://connect.garmin.com/*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Garmin%20-%20Keyboard%20Shortcuts.user.js
-// @version     1.2.1
+// @version     1.2.2
 // @grant       none
 // ==/UserScript==
 if (window.top == window.self) {
@@ -37,7 +37,7 @@ function keyShortcuts(key) {
 					break;
 				}
 			}
-			const input = document.querySelector("[class^='WeightPage_weightInputContainer__1yJBt'] input");
+			const input = document.querySelector("[class^='WeightPage_weightInputContainer'] input");
 			input.focus();
 		}
 		else {
