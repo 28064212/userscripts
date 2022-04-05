@@ -6,7 +6,7 @@
 // @include /^https?://(www\.)?myfitnesspal\.com/user/.*/diary/add\?.*/
 // @match https://www.myfitnesspal.com/food/diary*
 // @match https://www.myfitnesspal.com/food/search
-// @version 1.4.2
+// @version 1.4.3
 // @description	a/z for up/down, q to select, w to select quantity, shift+d delete all
 // ==/UserScript==
 
