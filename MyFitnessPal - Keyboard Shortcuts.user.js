@@ -171,10 +171,12 @@ function keyShortcuts(key) {
 	}
 	else if (!intext && shift && code == 68) {
 		// shift+d - delete all
-		let links = document.querySelectorAll('.delete a');
-		if (links.length > 0) {
-			for (let l of links) {
-				window.open(l.href)
+		if (window.confirm("Delete all?")) {
+			let links = document.querySelectorAll('.delete a');
+			if (links.length > 0) {
+				for (let l of links) {
+					window.open(l.href)
+				}
 			}
 		}
 	}
