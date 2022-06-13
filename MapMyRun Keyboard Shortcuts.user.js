@@ -6,7 +6,7 @@
 // @match       https://www.mapmyrun.com/routes/my_routes/
 // @match       https://www.mapmyrun.com/activity_feed*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
-// @version     1.5
+// @version     1.5.1
 // @grant       none
 // ==/UserScript==
 
@@ -20,7 +20,7 @@ function keyShortcuts(key) {
 	var alt = key.altKey;
 	if (code == 32 && ctrl) {
 		// Ctrl+Space on workout edit to clear route and focus
-		document.getElementsByTagName('button')[0].click();
+		document.querySelector('.routeSelector-25BXq .MuiButton-label span').click();
 		document.getElementsByClassName('routeSelector-25BXq')[0].getElementsByTagName("input")[0].focus();
 		key.preventDefault();
 	}
