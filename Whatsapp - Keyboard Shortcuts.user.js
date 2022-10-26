@@ -3,7 +3,7 @@
 // @namespace https://github.com/28064212/userscripts
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Whatsapp%20-%20Keyboard%20Shortcuts.user.js
 // @include https://web.whatsapp.com/
-// @version 1.3.1
+// @version 1.3.2
 // @grant none
 // @inject-into content
 // ==/UserScript==
@@ -17,7 +17,7 @@ function keyShortcuts(key) {
 	var alt = key.altKey;
 	if (alt && (code == 40 || code == 38)) {
 		var chats = document.querySelectorAll('#pane-side > div > div > div > div');
-		var active = document.querySelector('div[aria-selected="true"]') == null ? null : document.querySelector('div[aria-selected="true"]').parentElement;
+		var active = document.querySelector('div[aria-selected="true"]') == null ? null : document.querySelector('div[aria-selected="true"]').parentElement.parentElement;
 		var target = chats[0];
 		if (active == null) {
 			var lowest = getIndex(chats[0]);
@@ -43,7 +43,7 @@ function keyShortcuts(key) {
 				'bubbles': true,
 				'cancelable': true
 			});
-			target.firstChild.firstChild.dispatchEvent(event);
+			target.querySelector('img').dispatchEvent(event);
 		}
 	}
 	else if (ctrl && code == 220) {
