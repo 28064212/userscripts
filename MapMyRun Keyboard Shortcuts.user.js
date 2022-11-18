@@ -6,7 +6,7 @@
 // @match       https://www.mapmyrun.com/routes/my_routes/
 // @match       https://www.mapmyrun.com/activity_feed*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
-// @version     1.5.1
+// @version     1.5.2
 // @grant       none
 // ==/UserScript==
 
@@ -20,8 +20,10 @@ function keyShortcuts(key) {
 	var alt = key.altKey;
 	if (code == 32 && ctrl) {
 		// Ctrl+Space on workout edit to clear route and focus
+		const config = { attributes: false, childList: true, subtree: true };
+		const observer = new MutationObserver(routeCallback);
+		observer.observe(document.querySelector('.routeSelector-25BXq'), config);
 		document.querySelector('.routeSelector-25BXq .MuiButton-label span').click();
-		document.getElementsByClassName('routeSelector-25BXq')[0].getElementsByTagName("input")[0].focus();
 		key.preventDefault();
 	}
 	else if (code == 65 && ctrl) {
@@ -81,4 +83,10 @@ function keyShortcuts(key) {
 function callback(mutationList, observer) {
 	Array.prototype.slice.call(document.getElementsByTagName('span')).filter(el => el.textContent.trim() === "Delete")[0].click();
 	observer.disconnect();
+}
+function routeCallback(mutationList, observer) {
+	if (document.querySelector('.routeSelector-25BXq input')) {
+		document.querySelector('.routeSelector-25BXq input').focus();
+		observer.disconnect();
+	}
 }
