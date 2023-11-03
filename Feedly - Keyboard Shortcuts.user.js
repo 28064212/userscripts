@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/userscripts
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.3
+// @version     1.3.1
 // @description	a/z for up/down, w to expand, q to view, ctrl+\ to hide sidebar
 // ==/UserScript==
 
@@ -118,7 +118,7 @@ function keyShortcuts(key) {
 	}
 	else if (!intext && !ctrl && !alt && code == 81 && hl != null) {
 		// q - open in new tab
-		window.open(hl.getElementsByClassName("entry__title")[0])
+		window.open(hl.querySelector('a'));
 		hl.classList.add('highlight436255');
 	}
 	else if (!intext && !ctrl && !alt && code == 87 && hl != null) {
