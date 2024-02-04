@@ -6,35 +6,34 @@
 // @match       https://www.mapmyrun.com/routes/my_routes/
 // @match       https://www.mapmyrun.com/activity_feed*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/MapMyRun%20Keyboard%20Shortcuts.user.js
-// @version     1.5.2
+// @version     1.5.3
 // @grant       none
 // ==/UserScript==
 
+var routeSelector = '[class^="routeSelector"]';
 if (window.top == window.self) {
 	window.addEventListener('keydown', keyShortcuts, true);
 }
-
 function keyShortcuts(key) {
 	var code = key.keyCode;
 	var ctrl = key.ctrlKey;
 	var alt = key.altKey;
-	if (code == 32 && ctrl) {
-		// Ctrl+Space on workout edit to clear route and focus
-		const config = { attributes: false, childList: true, subtree: true };
-		const observer = new MutationObserver(routeCallback);
-		observer.observe(document.querySelector('.routeSelector-25BXq'), config);
-		document.querySelector('.routeSelector-25BXq .MuiButton-label span').click();
-		key.preventDefault();
-	}
-	else if (code == 65 && ctrl) {
-		// Ctrl+A to focus on Notes
-		document.getElementsByClassName('input-2iIsn')[0].focus();
-		document.getElementsByClassName('input-2iIsn')[0].scrollIntoView();
+	if (code == 13 && window.location.href.indexOf('/edit/') != -1 && document.activeElement.nodeName.toLowerCase() != 'input' && document.activeElement.nodeName.toLowerCase() != 'textarea') {
+		// Enter on workout edit to focus on route (or note if route is selected already)
+		if (document.querySelector('[class*="selectedRoute"]') == null) {
+			// no route selected yet, so focus on it
+			document.querySelector(routeSelector + ' input').focus();
+		}
+		else {
+			// focus on the notes
+			document.querySelector('textarea').focus();
+			document.querySelector('textarea').scrollIntoView();
+		}
 		key.preventDefault();
 	}
 	else if (code == 83 && ctrl) {
 		// Ctrl+S on workout edit to save
-		document.getElementsByClassName('saveButtonContainer-3_WXK')[0].getElementsByTagName('button')[0].click();
+		document.querySelector('[class*="saveButtonContainer"] button').click()
 		key.preventDefault();
 	}
 	else if (code == 13 || (code >= 49 && code <= 57)) {
@@ -46,7 +45,7 @@ function keyShortcuts(key) {
 		else if (window.location.href.indexOf('activity_feed') != -1) {
 			// 1-9 to open workouts
 			key.preventDefault();
-			var workouts = document.getElementsByClassName('row-ZtOZv');
+			var workouts = document.querySelectorAll('[class^="row-"]');
 			code = code == 13 ? 49 : code; // set enter = 1
 			var num = code - 49;
 			if (workouts.length > 0 && num + 1 <= workouts.length) {
@@ -83,10 +82,4 @@ function keyShortcuts(key) {
 function callback(mutationList, observer) {
 	Array.prototype.slice.call(document.getElementsByTagName('span')).filter(el => el.textContent.trim() === "Delete")[0].click();
 	observer.disconnect();
-}
-function routeCallback(mutationList, observer) {
-	if (document.querySelector('.routeSelector-25BXq input')) {
-		document.querySelector('.routeSelector-25BXq input').focus();
-		observer.disconnect();
-	}
 }
