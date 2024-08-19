@@ -3,7 +3,7 @@
 // @namespace https://github.com/28064212/userscripts
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Google%20-%20Keyboard%20Shortcuts.user.js
 // @include /^https?://(www\.)?google\..*/search.*/
-// @version 1.6
+// @version 1.6.1
 // @description	a/z for up/down, q to open, ctrl-space to focus search
 // ==/UserScript==
 function addGlobalStyle(css) {
@@ -46,7 +46,8 @@ function keyShortcuts(key) {
 	let hl = document.getElementsByClassName('highlight436255')[0];
 	if (!isch && !intext && (code == 65 || code == 90)) {
 		// a/z - up/down
-		var list = document.querySelectorAll('.g');
+		var list = document.querySelectorAll('.g, .MkXWrd, .JJZKK, .cIkxbf');
+		list = Array.from(list).filter(l => l.offsetParent != null);
 		if (hl != null)
 			hl.classList.remove('highlight436255');
 		if (hl == null || !isElementInViewport(hl))
