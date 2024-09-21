@@ -12,24 +12,24 @@ if (window.top == window.self) {
 	window.addEventListener('keydown', keyShortcuts, true);
 }
 function keyShortcuts(key) {
-	var code = key.keyCode;
-	var ctrl = key.ctrlKey;
-	var alt = key.altKey;
+	let code = key.keyCode;
+	let ctrl = key.ctrlKey;
+	let alt = key.altKey;
 	if (alt && (code == 40 || code == 38)) {
-		var chats = document.querySelectorAll('#pane-side > div > div > div > div');
-		var active = document.querySelector('div[aria-selected="true"]') == null ? null : document.querySelector('div[aria-selected="true"]').parentElement.parentElement;
-		var target = chats[0];
+		let chats = document.querySelectorAll('#pane-side > div > div > div > div');
+		let active = document.querySelector('div[aria-selected="true"]') == null ? null : document.querySelector('div[aria-selected="true"]').parentElement.parentElement;
+		let target = chats[0];
 		if (active == null) {
-			var lowest = getIndex(chats[0]);
-			for (var i = 1; i < chats.length; i++) {
+			let lowest = getIndex(chats[0]);
+			for (let i = 1; i < chats.length; i++) {
 				if (getIndex(chats[i]) < lowest)
 					target = chats[i];
 			}
 		}
 		else {
-			var currentIndex = getIndex(active);
-			var closest, checkIndex;
-			for (var i = 0; i < chats.length; i++) {
+			let currentIndex = getIndex(active);
+			let closest, checkIndex;
+			for (let i = 0; i < chats.length; i++) {
 				checkIndex = getIndex(chats[i]);
 				if ((code == 40 && (checkIndex < closest || closest == undefined) && checkIndex > currentIndex) ||
 					(code == 38 && (checkIndex > closest || closest == undefined) && checkIndex < currentIndex)) {
@@ -39,7 +39,7 @@ function keyShortcuts(key) {
 			}
 		}
 		if (target != null) {
-			var event = new MouseEvent('mousedown', {
+			let event = new MouseEvent('mousedown', {
 				'bubbles': true,
 				'cancelable': true
 			});
@@ -48,7 +48,7 @@ function keyShortcuts(key) {
 	}
 	else if (ctrl && code == 220) {
 		//search - ctrl+\
-		var event = new MouseEvent('mousedown', {
+		let event = new MouseEvent('mousedown', {
 			'bubbles': true,
 			'cancelable': true
 		});
@@ -60,7 +60,7 @@ function keyShortcuts(key) {
 	}
 }
 function getIndex(c) {
-	var transform = c.style.transform;
+	let transform = c.style.transform;
 	if (transform.indexOf('translateY') !== -1)
 		return parseInt(transform.substring(transform.indexOf('Y(') + 2, transform.indexOf('px)')));
 	else
