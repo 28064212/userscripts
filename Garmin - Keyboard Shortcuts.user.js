@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/userscripts
 // @match       https://connect.garmin.com/*
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Garmin%20-%20Keyboard%20Shortcuts.user.js
-// @version     1.2.3
+// @version     1.2.4
 // @grant       none
 // ==/UserScript==
 if (window.top == window.self) {
@@ -16,7 +16,7 @@ function keyShortcuts(key) {
 	if ((code == 13 || (code >= 49 && code <= 57)) && window.location.href.includes('/activities') && !ctrl) {
 		// 1/Enter-9 to open workouts
 		key.preventDefault();
-		const workouts = document.querySelectorAll('a[href^="/activity/"]');
+		const workouts = document.querySelectorAll('a[href*="/activity/"]');
 		code = code == 13 ? 49 : code; // set enter = 1
 		const num = code - 49;
 		if (workouts.length > 0 && num + 1 <= workouts.length) {
