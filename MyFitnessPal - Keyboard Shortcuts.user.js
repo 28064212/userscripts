@@ -6,7 +6,7 @@
 // @include /^https?://(www\.)?myfitnesspal\.com/user/.*/diary/add\?.*/
 // @match https://www.myfitnesspal.com/food/diary*
 // @match https://www.myfitnesspal.com/food/search
-// @version 1.4.3
+// @version 1.4.4
 // @description	a/z for up/down, q to select, w to select quantity, shift+d delete all
 // ==/UserScript==
 
@@ -43,7 +43,7 @@ function keyShortcuts(key) {
 	else if (!intext && (code == 37)) {
 		// ←
 		if (window.location.pathname.startsWith("/food/diary")) {
-			document.querySelector(".prev").click();
+			document.querySelector('button[aria-label="Back"]').click();
 		}
 		else if (document.getElementById('recent').style.display != 'none') {
 			if (!ctrl)
@@ -70,7 +70,7 @@ function keyShortcuts(key) {
 	else if (!intext && (code == 39)) {
 		// →
 		if (window.location.pathname.startsWith("/food/diary")) {
-			document.querySelector(".next").click();
+			document.querySelector('button[aria-label="Next"]').click();
 		}
 		else if (document.getElementById('recent').style.display != 'none') {
 			if (!ctrl)
@@ -172,10 +172,10 @@ function keyShortcuts(key) {
 	else if (!intext && shift && code == 68) {
 		// shift+d - delete all
 		if (window.confirm("Delete all?")) {
-			let links = document.querySelectorAll('.delete a');
+			let links = document.querySelectorAll('button[aria-label="Delete food entry"]');
 			if (links.length > 0) {
 				for (let l of links) {
-					window.open(l.href)
+					l.click();
 				}
 			}
 		}
