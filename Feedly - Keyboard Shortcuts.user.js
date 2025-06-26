@@ -3,7 +3,7 @@
 // @namespace   https://github.com/28064212/userscripts
 // @downloadURL https://github.com/28064212/userscripts/raw/master/Feedly%20-%20Keyboard%20Shortcuts.user.js
 // @include	/^https?://(www\.)?feedly\.com/.*/
-// @version     1.3.1
+// @version     1.3.2
 // @description	a/z for up/down, w to expand, q to view, ctrl+\ to hide sidebar
 // ==/UserScript==
 
@@ -26,10 +26,10 @@ if (window.top == window.self) {
 	console.log("test");
 	addGlobalStyle("\
 		.fx .entry.u0{\n\
-			margin-bottom:auto !important;\n\
+			margin-bottom: auto !important;\n\
 		}\n\
 		.highlight436255 {\n\
-			border:red solid 1px !important;\n\
+			outline: red solid 1px !important;\n\
 		}");
 
 	window.addEventListener('keydown', keyShortcuts, true);
@@ -67,7 +67,7 @@ function keyShortcuts(key) {
 	var hl = document.getElementsByClassName('highlight436255')[0];
 	if (!intext && (code == 65 || code == 90)) {
 		// a/z - up/down
-		var list = document.getElementById('feedlyPageFX').getElementsByClassName('entry');
+		let list = document.querySelectorAll('main .entry');
 		if (hl != null)
 			hl.classList.remove('highlight436255');
 		if (hl == null || !isElementInViewport(hl))
